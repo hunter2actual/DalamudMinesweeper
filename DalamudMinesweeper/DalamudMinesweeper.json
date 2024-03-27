@@ -1,0 +1,12 @@
+{
+  "Author": "hunter2_",
+  "Name": "Minesweeper",
+  "Punchline": "Classic puzzle game.",
+  "Description": "Logic puzzle in which you find and flag hidden mines. Left click to uncover a square, right click to place a flag. The game ends when all mines are flagged and all safe squares have been uncovered.",
+  "ApplicableVersion": "any",
+  "Tags": [
+    "minesweeper",
+    "minigame",
+    "puzzle"
+  ]
+}

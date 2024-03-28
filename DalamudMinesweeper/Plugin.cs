@@ -11,41 +11,41 @@ public sealed class Plugin : IDalamudPlugin
 {
     private const string CommandName = "/minesweeper";
 
-    public DalamudPluginInterface _pluginInterface { get; init; }
-    private ICommandManager _commandManager { get; init; }
-    public Configuration _configuration { get; init; }
-    public WindowSystem _windowSystem = new("Minesweeper");
+    public DalamudPluginInterface PluginInterface { get; init; }
+    public Configuration Configuration { get; init; }
+    public WindowSystem WindowSystem = new("Minesweeper");
     private ConfigWindow _configWindow { get; init; }
+    private ICommandManager _commandManager { get; init; }
     private MainWindow _mainWindow { get; init; }
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
         [RequiredVersion("1.0")] ICommandManager commandManager)
     {
-        _pluginInterface = pluginInterface;
+        PluginInterface = pluginInterface;
         _commandManager = commandManager;
 
-        _configuration = _pluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
-        _configuration.Initialize(_pluginInterface);
+        Configuration = PluginInterface.GetPluginConfig() as Configuration ?? new Configuration();
+        Configuration.Initialize(PluginInterface);
 
         _configWindow = new ConfigWindow(this);
-        _mainWindow = new MainWindow(this, _configuration);
+        _mainWindow = new MainWindow(this, Configuration);
         
-        _windowSystem.AddWindow(_configWindow);
-        _windowSystem.AddWindow(_mainWindow);
+        WindowSystem.AddWindow(_configWindow);
+        WindowSystem.AddWindow(_mainWindow);
 
         _commandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
         {
             HelpMessage = "Open the Minesweeper window"
         });
 
-        _pluginInterface.UiBuilder.Draw += DrawUI;
-        _pluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
+        PluginInterface.UiBuilder.Draw += DrawUI;
+        PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
     }
 
     public void Dispose()
     {
-        _windowSystem.RemoveAllWindows();
+        WindowSystem.RemoveAllWindows();
         
         _configWindow.Dispose();
         _mainWindow.Dispose();
@@ -61,7 +61,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private void DrawUI()
     {
-        _windowSystem.Draw();
+        WindowSystem.Draw();
     }
 
     public void DrawConfigUI()

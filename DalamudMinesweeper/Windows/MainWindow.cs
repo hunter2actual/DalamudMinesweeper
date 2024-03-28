@@ -36,7 +36,7 @@ public class MainWindow : Window, IDisposable
 
         _plugin = plugin;
         _configuration = configuration;
-        _classicSprites = new ClassicSprites(plugin._pluginInterface);
+        _classicSprites = new ClassicSprites(plugin.PluginInterface);
         _game = InitialiseGame();
         _gridSquareSizeVec2 = new Vector2(0, 0);
         _boardPadding = new Vector2(5, 5);

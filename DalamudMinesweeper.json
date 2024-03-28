@@ -3,7 +3,7 @@
     "Author": "hunter2_",
     "Name": "Minesweeper",
     "InternalName": "DalamudMinesweeper",
-    "AssemblyVersion": "0.0.0.6",
+    "AssemblyVersion": "0.0.0.7",
     "Description": "Logic puzzle in which you find and flag hidden mines. Left click to uncover a square, right click to place a flag. The game ends when all mines are flagged and all safe squares have been uncovered.",
     "ApplicableVersion": "any",
     "Tags": [
@@ -18,9 +18,9 @@
     "LoadPriority": 0,
     "Punchline": "Classic puzzle game.",
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.6/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.6/latest.zip",
+    "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.7/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.7/latest.zip",
     "IconUrl": "https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/images/icon.png",
-    "Changelog": "Prevent accidental dragging of the window while clicking on the game board."
+    "Changelog": "Smiley in header, prevent accidental dragging of window."
   }
 ]

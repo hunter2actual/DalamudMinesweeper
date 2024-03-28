@@ -19,6 +19,7 @@ public class MainWindow : Window, IDisposable
     private int _gridSquareSizePx;
     private Vector2 _gridSquareSizePxVec2;
     private Vector2 _boardDimensions;
+    private bool _smileyClicked;
     private readonly Vector2 _boardPaddingPx = new Vector2(5, 5);
     private readonly int _dalamudWindowPaddingPx = 8;
     private readonly int _titleBarHeightPx = 26;
@@ -77,14 +78,14 @@ public class MainWindow : Window, IDisposable
         var cursorPos = windowPos + topLeft + _boardPaddingPx ;
 
         DrawBackground(drawList, cursorPos, new Vector2(0, headerHeightPx));
-        DrawHeader(drawList, cursorPos, topRight.X - topLeft.X);
+        DrawHeader(drawList, cursorPos, topRight.X - topLeft.X, mousePos);
         cursorPos += new Vector2(0, headerHeightPx);
 
         for (int y = 0; y < _boardDimensions.Y; y++) {
             for (int x = 0; x < _boardDimensions.X; x++) {
                 drawList.AddImage(GetCellImage(_game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizePxVec2);
 
-                if (MouseInSquare(mousePos, cursorPos) && ImGui.IsWindowFocused()) {
+                if (MouseInSquare(mousePos, cursorPos, _gridSquareSizePx) && ImGui.IsWindowFocused()) {
                     DrawHighlightSquare(drawList, cursorPos);
                     if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !_game.GetCell(x,y).isFlagged) {
                         _game.Click(x, y);
@@ -123,13 +124,45 @@ public class MainWindow : Window, IDisposable
             highlightSquareColour);
     }
 
-    private void DrawHeader(ImDrawListPtr drawList, Vector2 start, float headerWidth)
+    private void DrawHeader(ImDrawListPtr drawList, Vector2 start, float headerWidth, Vector2 mousePos)
     {
-        var smileySize = _classicSprites.Smiley.Size * _configuration.Zoom;
+        IDalamudTextureWrap smileyToDraw = _classicSprites.Smiley;
+        var smileySize = smileyToDraw.Size * _configuration.Zoom;
         float leftPadding = (float) ((headerWidth - smileySize.X) * 0.5);
         var cursorPos = start + new Vector2(leftPadding, 0);
 
-        drawList.AddImage(_classicSprites.Smiley.ImGuiHandle, cursorPos, cursorPos + smileySize);
+        if (_game.GameState == GameState.Victorious)
+        {
+            smileyToDraw = _classicSprites.SmileyShades;
+        }
+        else if (_game.GameState == GameState.Boom)
+        {
+            smileyToDraw = _classicSprites.SmileyDead;
+        }
+
+        if (MouseInSquare(mousePos, cursorPos, (int) smileySize.X) 
+            && ImGui.IsWindowFocused())
+        {
+            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            {
+                smileyToDraw = _classicSprites.SmileyClicked;
+                _smileyClicked = true;
+            }
+            else if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && _smileyClicked)
+            {
+                smileyToDraw = _classicSprites.SmileyClicked;
+            }
+            else if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && _smileyClicked)
+            {
+                smileyToDraw = _classicSprites.Smiley;
+                _smileyClicked = false;
+                InitialiseGame();
+            }
+        }
+        
+        // TODO soyface when clicking on game
+
+        drawList.AddImage(smileyToDraw.ImGuiHandle, cursorPos, cursorPos + smileySize);
     }
 
     private void DrawFooter(Vector2 start, float footerWidth)
@@ -198,9 +231,9 @@ public class MainWindow : Window, IDisposable
             _configuration.NumMines);
     }
 
-    private bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos)
+    private bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos, int squareSize)
         => mousePos.X > cursorPos.X
-        && mousePos.X <= cursorPos.X + _gridSquareSizePx
+        && mousePos.X <= cursorPos.X + squareSize
         && mousePos.Y > cursorPos.Y
-        && mousePos.Y <= cursorPos.Y + _gridSquareSizePx;
+        && mousePos.Y <= cursorPos.Y + squareSize;
 }

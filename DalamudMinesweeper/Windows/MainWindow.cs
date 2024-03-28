@@ -5,6 +5,7 @@ using Dalamud.Interface.Colors;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
+using DalamudMinesweeper.Components;
 using DalamudMinesweeper.Game;
 using ImGuiNET;
 
@@ -25,6 +26,8 @@ public class MainWindow : Window, IDisposable
     private readonly int _titleBarHeightPx = 26;
     private readonly Vector2 _footerHeightPx = new Vector2(0, 26);
 
+    private GameBoard _gameBoard;
+
     public MainWindow(Plugin plugin, Configuration configuration): base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoScrollWithMouse
@@ -42,6 +45,8 @@ public class MainWindow : Window, IDisposable
         _classicSprites = new ClassicSprites(plugin.PluginInterface);
         _game = InitialiseGame();
         _gridSquareSizePxVec2 = new Vector2(0, 0);
+
+        _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
     }
 
     public void Dispose()
@@ -81,25 +86,7 @@ public class MainWindow : Window, IDisposable
         DrawHeader(drawList, cursorPos, topRight.X - topLeft.X, mousePos);
         cursorPos += new Vector2(0, headerHeightPx);
 
-        for (int y = 0; y < _boardDimensions.Y; y++) {
-            for (int x = 0; x < _boardDimensions.X; x++) {
-                drawList.AddImage(GetCellImage(_game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizePxVec2);
-
-                if (MouseInSquare(mousePos, cursorPos, _gridSquareSizePx) && ImGui.IsWindowFocused()) {
-                    DrawHighlightSquare(drawList, cursorPos);
-                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !_game.GetCell(x,y).isFlagged) {
-                        _game.Click(x, y);
-                    }
-                    else if (ImGui.IsMouseReleased(ImGuiMouseButton.Right)) {
-                        _game.Flag(x, y);
-                    }
-                }
-
-                cursorPos.X += _gridSquareSizePx;
-            }
-            cursorPos.Y += _gridSquareSizePx;
-            cursorPos.X -= _boardDimensions.X * _gridSquareSizePx;
-        }
+        _gameBoard.Draw(cursorPos);
 
         DrawFooter(bottomLeft - _footerHeightPx, bottomRight.X - bottomLeft.X);
     }
@@ -112,16 +99,6 @@ public class MainWindow : Window, IDisposable
             cursorPos - _boardPaddingPx,
             cursorPos + _gridSquareSizePx*_boardDimensions + _boardPaddingPx + headerHeightPx,
             backgroundColour);
-    }
-
-    private void DrawHighlightSquare(ImDrawListPtr drawList, Vector2 cursorPos)
-    {
-        const uint highlightSquareColour = 0x44FFFFFF; // translucent white
-
-        drawList.AddRectFilled(
-            cursorPos,
-            cursorPos + _gridSquareSizePxVec2,
-            highlightSquareColour);
     }
 
     private void DrawHeader(ImDrawListPtr drawList, Vector2 start, float headerWidth, Vector2 mousePos)
@@ -196,39 +173,16 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    private IDalamudTextureWrap GetCellImage(Cell cell)
-    {
-        if (!cell.isRevealed) {
-            if (cell.isFlagged) {
-                return _classicSprites.TileFlag;
-            }
-            return _classicSprites.TileHidden;
-        }
-        return cell.contents switch {
-            CellContents.Clear => _classicSprites.Tile0,
-            CellContents.Mine => _classicSprites.TileMine,
-            CellContents.ExplodedMine => _classicSprites.TileMineBoom,
-            CellContents.Number => cell.numNeighbouringMines switch {
-                1 => _classicSprites.Tile1,
-                2 => _classicSprites.Tile2,
-                3 => _classicSprites.Tile3,
-                4 => _classicSprites.Tile4,
-                5 => _classicSprites.Tile5,
-                6 => _classicSprites.Tile6,
-                7 => _classicSprites.Tile7,
-                8 => _classicSprites.Tile8,
-                _ => throw new("Invalid number of mines in cell " + cell.numNeighbouringMines)
-            },
-            _ => throw new("Unknown cell contents.")
-        };
-    }
-
     private MinesweeperGame InitialiseGame()
     {
-        return _game = new MinesweeperGame(
+        _game = new MinesweeperGame(
             _configuration.BoardWidth,
             _configuration.BoardHeight,
             _configuration.NumMines);
+
+        _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
+
+        return _game;
     }
 
     private bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos, int squareSize)

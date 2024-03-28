@@ -7,16 +7,16 @@ namespace DalamudMinesweeper.Components;
 
 public class GameBoard
 {
+    public MinesweeperGame Game { get; set; }
     private readonly ClassicSprites _classicSprites;
     private readonly Configuration _configuration;
-    private MinesweeperGame _game;
     private Vector2 _gridSquareSizePxVec2 = new Vector2();
 
     public bool CellClickActive { get; private set;}
 
     public GameBoard(MinesweeperGame game, ClassicSprites classicSprites, Configuration configuration)
     {
-        _game = game;
+        Game = game;
         _classicSprites = classicSprites;
         _configuration = configuration;
     }
@@ -30,25 +30,25 @@ public class GameBoard
         var gridSquareSizePx = _classicSprites.Tile0.Width * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = gridSquareSizePx;
 
-        for (int y = 0; y < _game.Height; y++) {
-            for (int x = 0; x < _game.Width; x++) {
-                drawList.AddImage(GetCellImage(_game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizePxVec2);
+        for (int y = 0; y < Game.Height; y++) {
+            for (int x = 0; x < Game.Width; x++) {
+                drawList.AddImage(GetCellImage(Game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizePxVec2);
 
                 if (MouseInSquare(mousePos, cursorPos, gridSquareSizePx) && ImGui.IsWindowFocused()) {
                     DrawHighlightSquare(drawList, cursorPos);
-                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !_game.GetCell(x,y).isFlagged) {
-                        _game.Click(x, y);
+                    if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && !Game.GetCell(x,y).isFlagged) {
+                        Game.Click(x, y);
                         // TODO active click logic
                     }
                     else if (ImGui.IsMouseReleased(ImGuiMouseButton.Right)) {
-                        _game.Flag(x, y);
+                        Game.Flag(x, y);
                     }
                 }
 
                 cursorPos.X += gridSquareSizePx;
             }
             cursorPos.Y += gridSquareSizePx;
-            cursorPos.X -= _game.Width * gridSquareSizePx;
+            cursorPos.X -= Game.Width * gridSquareSizePx;
         }
     }
 
@@ -81,7 +81,6 @@ public class GameBoard
             _ => throw new("Unknown cell contents.")
         };
     }
-
     
     private void DrawHighlightSquare(ImDrawListPtr drawList, Vector2 cursorPos)
     {

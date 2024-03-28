@@ -20,13 +20,13 @@ public class MainWindow : Window, IDisposable
     private int _gridSquareSizePx;
     private Vector2 _gridSquareSizePxVec2;
     private Vector2 _boardDimensions;
-    private bool _smileyClicked;
     private readonly Vector2 _boardPaddingPx = new Vector2(5, 5);
     private readonly int _dalamudWindowPaddingPx = 8;
     private readonly int _titleBarHeightPx = 26;
     private readonly Vector2 _footerHeightPx = new Vector2(0, 26);
 
     private GameBoard _gameBoard;
+    private Header _header;
 
     public MainWindow(Plugin plugin, Configuration configuration): base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -43,10 +43,11 @@ public class MainWindow : Window, IDisposable
         _plugin = plugin;
         _configuration = configuration;
         _classicSprites = new ClassicSprites(plugin.PluginInterface);
-        _game = InitialiseGame();
         _gridSquareSizePxVec2 = new Vector2(0, 0);
 
+        _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
+        _header = new Header(_game, _classicSprites, _configuration, () => InitialiseGame());
     }
 
     public void Dispose()
@@ -76,14 +77,16 @@ public class MainWindow : Window, IDisposable
         var topRight = new Vector2(bottomRight.X, topLeft.Y);
         var bottomLeft = new Vector2(topLeft.X, bottomRight.Y);
 
+        // Cover everything except the footer in an anticlick field
         ImGui.InvisibleButton("anticlick", bottomRight - topLeft - _footerHeightPx);
         
-        var mousePos = ImGui.GetMousePos();
         var drawList = ImGui.GetWindowDrawList();
         var cursorPos = windowPos + topLeft + _boardPaddingPx ;
 
         DrawBackground(drawList, cursorPos, new Vector2(0, headerHeightPx));
-        DrawHeader(drawList, cursorPos, topRight.X - topLeft.X, mousePos);
+        
+        _header.Draw(cursorPos, topRight.X - topLeft.X);
+        
         cursorPos += new Vector2(0, headerHeightPx);
 
         _gameBoard.Draw(cursorPos);
@@ -99,47 +102,6 @@ public class MainWindow : Window, IDisposable
             cursorPos - _boardPaddingPx,
             cursorPos + _gridSquareSizePx*_boardDimensions + _boardPaddingPx + headerHeightPx,
             backgroundColour);
-    }
-
-    private void DrawHeader(ImDrawListPtr drawList, Vector2 start, float headerWidth, Vector2 mousePos)
-    {
-        IDalamudTextureWrap smileyToDraw = _classicSprites.Smiley;
-        var smileySize = smileyToDraw.Size * _configuration.Zoom;
-        float leftPadding = (float) ((headerWidth - smileySize.X) * 0.5);
-        var cursorPos = start + new Vector2(leftPadding, 0);
-
-        if (_game.GameState == GameState.Victorious)
-        {
-            smileyToDraw = _classicSprites.SmileyShades;
-        }
-        else if (_game.GameState == GameState.Boom)
-        {
-            smileyToDraw = _classicSprites.SmileyDead;
-        }
-
-        if (MouseInSquare(mousePos, cursorPos, (int) smileySize.X) 
-            && ImGui.IsWindowFocused())
-        {
-            if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
-            {
-                smileyToDraw = _classicSprites.SmileyClicked;
-                _smileyClicked = true;
-            }
-            else if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && _smileyClicked)
-            {
-                smileyToDraw = _classicSprites.SmileyClicked;
-            }
-            else if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && _smileyClicked)
-            {
-                smileyToDraw = _classicSprites.Smiley;
-                _smileyClicked = false;
-                InitialiseGame();
-            }
-        }
-        
-        // TODO soyface when clicking on game
-
-        drawList.AddImage(smileyToDraw.ImGuiHandle, cursorPos, cursorPos + smileySize);
     }
 
     private void DrawFooter(Vector2 start, float footerWidth)
@@ -180,7 +142,14 @@ public class MainWindow : Window, IDisposable
             _configuration.BoardHeight,
             _configuration.NumMines);
 
-        _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
+        if (_header is not null) 
+        {
+            _header.Game = _game;
+        }
+        if (_gameBoard is not null) 
+        {
+            _gameBoard.Game = _game;
+        }
 
         return _game;
     }

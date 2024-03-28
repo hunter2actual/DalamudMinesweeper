@@ -18,8 +18,8 @@
     "LoadPriority": 0,
     "Punchline": "Classic puzzle game.",
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.4/DalamudMinesweeper.zip",
-    "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.4/DalamudMinesweeper.zip",
+    "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.4/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.4/latest.zip",
     "IconUrl": "https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/images/icon.png"
   }
 ]

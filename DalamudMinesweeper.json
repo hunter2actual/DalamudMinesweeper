@@ -20,6 +20,7 @@
     "AcceptsFeedback": true,
     "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.5/latest.zip",
     "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/0.0.0.5/latest.zip",
-    "IconUrl": "https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/images/icon.png"
+    "IconUrl": "https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/images/icon.png",
+    "Changelog": "Prevent accidental dragging of the window while clicking on the game board."
   }
 ]

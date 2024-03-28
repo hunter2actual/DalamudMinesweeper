@@ -21,6 +21,7 @@ public class MainWindow : Window, IDisposable
     private Vector2 _boardDimensions;
     private readonly Vector2 _boardPadding;
     private readonly int _dalamudWindowPadding = 8;
+    private readonly Vector2 footerHeight = new Vector2(0, 26);
 
     public MainWindow(Plugin plugin, Configuration configuration): base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -65,6 +66,8 @@ public class MainWindow : Window, IDisposable
         var bottomRight = ImGui.GetWindowContentRegionMax();
         var topRight = new Vector2(bottomRight.X, topLeft.Y);
         var bottomLeft = new Vector2(topLeft.X, bottomRight.Y);
+
+        ImGui.InvisibleButton("anticlick", bottomRight - topLeft - footerHeight);
         
         var mousePos = ImGui.GetMousePos();
         var cursorPos = windowPos + topLeft + _boardPadding;
@@ -93,7 +96,7 @@ public class MainWindow : Window, IDisposable
             cursorPos.X -= _boardDimensions.X * _gridSquareSize;
         }
 
-        DrawFooter(bottomLeft - new Vector2(0, 26), bottomRight.X - bottomLeft.X);
+        DrawFooter(bottomLeft - footerHeight, bottomRight.X - bottomLeft.X);
     }
 
     private void DrawBackground(ImDrawListPtr drawList, Vector2 cursorPos)

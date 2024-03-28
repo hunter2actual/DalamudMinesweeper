@@ -18,7 +18,8 @@ public class MinesweeperGame {
         GameState = GameState.Playing;
     }
 
-    public void Click(int x, int y) {
+    public void Click(int x, int y)
+    {
         if (GameState != GameState.Playing) return;
 
         if (!_firstMoveTaken) {
@@ -48,7 +49,8 @@ public class MinesweeperGame {
             GameState = GameState.Victorious;
     }
 
-    public void Flag(int x, int y) {
+    public void Flag(int x, int y)
+    {
         if (GameState != GameState.Playing || !_firstMoveTaken) return;
 
         _board.ToggleCellFlag(x, y);

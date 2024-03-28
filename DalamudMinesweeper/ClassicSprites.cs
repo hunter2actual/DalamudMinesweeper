@@ -8,7 +8,8 @@ namespace DalamudMinesweeper;
 public class ClassicSprites : IDisposable {
     private DalamudPluginInterface _pluginInterface { get; set; }
 
-    public ClassicSprites(DalamudPluginInterface pluginInterface) {
+    public ClassicSprites(DalamudPluginInterface pluginInterface)
+    {
         _pluginInterface = pluginInterface;
         Tile0 = LoadImage("0.png");
         Tile1 = LoadImage("1.png");
@@ -23,9 +24,16 @@ public class ClassicSprites : IDisposable {
         TileHidden = LoadImage("Hidden.png");
         TileMine = LoadImage("Mine1.png");
         TileMineBoom = LoadImage("Mine2.png");
+
+        Smiley = LoadImage("Smiley.png");
+        SmileyClicked = LoadImage("SmileyClicked.png");
+        SmileyDead = LoadImage("SmileyDead.png");
+        SmileyShades = LoadImage("SmileyShades.png");
+        SmileySoy = LoadImage("SmileySoy.png");
     }
 
-    public void Dispose() {
+    public void Dispose()
+    {
         Tile0.Dispose();
         Tile1.Dispose();
         Tile2.Dispose();
@@ -39,9 +47,15 @@ public class ClassicSprites : IDisposable {
         TileHidden.Dispose();
         TileMine.Dispose();
         TileMineBoom.Dispose();
+        Smiley.Dispose();
+        SmileyClicked.Dispose();
+        SmileyDead.Dispose();
+        SmileyShades.Dispose();
+        SmileySoy.Dispose();
     }
 
-    private IDalamudTextureWrap LoadImage(string path) {
+    private IDalamudTextureWrap LoadImage(string path)
+    {
         var fullPath = Path.Combine(_pluginInterface.AssemblyLocation.Directory?.FullName!, path);
         return _pluginInterface.UiBuilder.LoadImage(fullPath);
     }
@@ -59,4 +73,10 @@ public class ClassicSprites : IDisposable {
     public IDalamudTextureWrap TileHidden { get; init; }
     public IDalamudTextureWrap TileMine { get; init; }
     public IDalamudTextureWrap TileMineBoom { get; init; }
+
+    public IDalamudTextureWrap Smiley { get; init; }
+    public IDalamudTextureWrap SmileyClicked { get; init; }
+    public IDalamudTextureWrap SmileyDead { get; init; }
+    public IDalamudTextureWrap SmileyShades { get; init; }
+    public IDalamudTextureWrap SmileySoy { get; init; }
 }

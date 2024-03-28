@@ -21,7 +21,8 @@ public class BoardBuilder {
             throw new("Too many bombs!");
     }
 
-    public Board Build() {
+    public Board Build()
+    {
         var board = new Board {
             width = _width,
             height = _height,
@@ -35,13 +36,15 @@ public class BoardBuilder {
         return board;
     }
 
-    public BoardBuilder WithClearPosition(int x, int y) {
+    public BoardBuilder WithClearPosition(int x, int y)
+    {
         _xStart = x;
         _yStart = y;
         return this;
     }
 
-    private Board PopulateCells(Board board) {
+    private Board PopulateCells(Board board)
+    {
         for (int x = 0; x < board.width; x++) {
             for (int y = 0; y < board.height; y++) {
                 board.cells[x, y] = new Cell {
@@ -53,7 +56,8 @@ public class BoardBuilder {
         return board;
     }
 
-    private Board PlaceBombs(Board board) {
+    private Board PlaceBombs(Board board)
+    {
         var random = new Random();
         var placedBombs = 0;
         Cell currentCell;
@@ -79,7 +83,8 @@ public class BoardBuilder {
 
     record point2(int x, int y);
 
-    private Board SetLocations(Board board) {
+    private Board SetLocations(Board board)
+    {
         Cell currentCell;
         point2 currentPos;
         for (int x = 0; x < board.width; x++) {
@@ -106,7 +111,8 @@ public class BoardBuilder {
         return board;
     }
 
-    private Board SetNeighbouringBombs(Board board) {
+    private Board SetNeighbouringBombs(Board board)
+    {
         Cell currentCell;
         for (int x = 0; x < board.width; x++) {
             for (int y = 0; y < board.height; y++) {

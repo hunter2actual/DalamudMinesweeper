@@ -16,12 +16,13 @@ public class MainWindow : Window, IDisposable
     private readonly ClassicSprites _classicSprites;
     private readonly Configuration _configuration;
     private MinesweeperGame _game;
-    private int _gridSquareSize;
-    private Vector2 _gridSquareSizeVec2;
+    private int _gridSquareSizePx;
+    private Vector2 _gridSquareSizePxVec2;
     private Vector2 _boardDimensions;
-    private readonly Vector2 _boardPadding;
-    private readonly int _dalamudWindowPadding = 8;
-    private readonly Vector2 footerHeight = new Vector2(0, 26);
+    private readonly Vector2 _boardPaddingPx = new Vector2(5, 5);
+    private readonly int _dalamudWindowPaddingPx = 8;
+    private readonly int _titleBarHeightPx = 26;
+    private readonly Vector2 _footerHeightPx = new Vector2(0, 26);
 
     public MainWindow(Plugin plugin, Configuration configuration): base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -39,8 +40,7 @@ public class MainWindow : Window, IDisposable
         _configuration = configuration;
         _classicSprites = new ClassicSprites(plugin.PluginInterface);
         _game = InitialiseGame();
-        _gridSquareSizeVec2 = new Vector2(0, 0);
-        _boardPadding = new Vector2(5, 5);
+        _gridSquareSizePxVec2 = new Vector2(0, 0);
     }
 
     public void Dispose()
@@ -50,15 +50,18 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        _gridSquareSize = _classicSprites.Tile0.Width * _configuration.Zoom;
-        _gridSquareSizeVec2.X = _gridSquareSizeVec2.Y = _gridSquareSize;
-        _boardDimensions = new Vector2(_game.Width, _game.Height);
-        var windowSize = new Vector2(
-            _gridSquareSize*_boardDimensions.X + 2*_boardPadding.X + 2*_dalamudWindowPadding,
-            _gridSquareSize*_boardDimensions.Y + 2*_boardPadding.Y + 2*_dalamudWindowPadding + 62);
-        ImGui.SetWindowSize(windowSize);
-
+        // Calculate element sizes
         var windowPos = ImGui.GetWindowPos();
+        var headerHeightPx = _classicSprites.Smiley.Height * _configuration.Zoom;
+
+        _gridSquareSizePx = _classicSprites.Tile0.Width * _configuration.Zoom;
+        _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
+        _boardDimensions = new Vector2(_game.Width, _game.Height);
+        var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_boardPaddingPx.X + 2*_dalamudWindowPaddingPx;
+        var windowHeightPx = _gridSquareSizePx*_boardDimensions.Y + 2*_boardPaddingPx.Y + 2*_dalamudWindowPaddingPx
+                            + _footerHeightPx.Y + headerHeightPx + _titleBarHeightPx + 8;
+        var windowSize = new Vector2(windowWidthPx, windowHeightPx);
+        ImGui.SetWindowSize(windowSize);
 
         // Get window corner coords (relative to window)
         // Content region is 8px padded from window
@@ -67,18 +70,19 @@ public class MainWindow : Window, IDisposable
         var topRight = new Vector2(bottomRight.X, topLeft.Y);
         var bottomLeft = new Vector2(topLeft.X, bottomRight.Y);
 
-        ImGui.InvisibleButton("anticlick", bottomRight - topLeft - footerHeight);
+        ImGui.InvisibleButton("anticlick", bottomRight - topLeft - _footerHeightPx);
         
         var mousePos = ImGui.GetMousePos();
-        var cursorPos = windowPos + topLeft + _boardPadding;
-
         var drawList = ImGui.GetWindowDrawList();
+        var cursorPos = windowPos + topLeft + _boardPaddingPx ;
 
-        DrawBackground(drawList, cursorPos);
+        DrawBackground(drawList, cursorPos, new Vector2(0, headerHeightPx));
+        DrawHeader(drawList, cursorPos, topRight.X - topLeft.X);
+        cursorPos += new Vector2(0, headerHeightPx);
 
         for (int y = 0; y < _boardDimensions.Y; y++) {
             for (int x = 0; x < _boardDimensions.X; x++) {
-                drawList.AddImage(GetCellImage(_game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizeVec2);
+                drawList.AddImage(GetCellImage(_game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizePxVec2);
 
                 if (MouseInSquare(mousePos, cursorPos) && ImGui.IsWindowFocused()) {
                     DrawHighlightSquare(drawList, cursorPos);
@@ -90,22 +94,22 @@ public class MainWindow : Window, IDisposable
                     }
                 }
 
-                cursorPos.X += _gridSquareSize;
+                cursorPos.X += _gridSquareSizePx;
             }
-            cursorPos.Y += _gridSquareSize;
-            cursorPos.X -= _boardDimensions.X * _gridSquareSize;
+            cursorPos.Y += _gridSquareSizePx;
+            cursorPos.X -= _boardDimensions.X * _gridSquareSizePx;
         }
 
-        DrawFooter(bottomLeft - footerHeight, bottomRight.X - bottomLeft.X);
+        DrawFooter(bottomLeft - _footerHeightPx, bottomRight.X - bottomLeft.X);
     }
 
-    private void DrawBackground(ImDrawListPtr drawList, Vector2 cursorPos)
+    private void DrawBackground(ImDrawListPtr drawList, Vector2 cursorPos, Vector2 headerHeightPx)
     {
         const uint backgroundColour = 0xFF808080; // ugly grey
 
         drawList.AddRectFilled(
-            cursorPos - _boardPadding,
-            cursorPos + _gridSquareSize*_boardDimensions + _boardPadding,
+            cursorPos - _boardPaddingPx,
+            cursorPos + _gridSquareSizePx*_boardDimensions + _boardPaddingPx + headerHeightPx,
             backgroundColour);
     }
 
@@ -115,8 +119,17 @@ public class MainWindow : Window, IDisposable
 
         drawList.AddRectFilled(
             cursorPos,
-            cursorPos + _gridSquareSizeVec2,
+            cursorPos + _gridSquareSizePxVec2,
             highlightSquareColour);
+    }
+
+    private void DrawHeader(ImDrawListPtr drawList, Vector2 start, float headerWidth)
+    {
+        var smileySize = _classicSprites.Smiley.Size * _configuration.Zoom;
+        float leftPadding = (float) ((headerWidth - smileySize.X) * 0.5);
+        var cursorPos = start + new Vector2(leftPadding, 0);
+
+        drawList.AddImage(_classicSprites.Smiley.ImGuiHandle, cursorPos, cursorPos + smileySize);
     }
 
     private void DrawFooter(Vector2 start, float footerWidth)
@@ -142,7 +155,7 @@ public class MainWindow : Window, IDisposable
             ImGui.TextColored(ImGuiColors.DalamudRed, "YOU DIED");
         ImGui.SameLine();
         
-        var rightOffset = ImGui.CalcTextSize("New Game").X + _dalamudWindowPadding;
+        var rightOffset = ImGui.CalcTextSize("New Game").X + _dalamudWindowPaddingPx;
         ImGui.SetCursorPosX(start.X + footerWidth - rightOffset);
         if (ImGui.Button("New Game"))
         {
@@ -150,7 +163,8 @@ public class MainWindow : Window, IDisposable
         }
     }
 
-    private IDalamudTextureWrap GetCellImage(Cell cell) {
+    private IDalamudTextureWrap GetCellImage(Cell cell)
+    {
         if (!cell.isRevealed) {
             if (cell.isFlagged) {
                 return _classicSprites.TileFlag;
@@ -176,7 +190,8 @@ public class MainWindow : Window, IDisposable
         };
     }
 
-    private MinesweeperGame InitialiseGame() {
+    private MinesweeperGame InitialiseGame()
+    {
         return _game = new MinesweeperGame(
             _configuration.BoardWidth,
             _configuration.BoardHeight,
@@ -185,7 +200,7 @@ public class MainWindow : Window, IDisposable
 
     private bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos)
         => mousePos.X > cursorPos.X
-        && mousePos.X <= cursorPos.X + _gridSquareSize
+        && mousePos.X <= cursorPos.X + _gridSquareSizePx
         && mousePos.Y > cursorPos.Y
-        && mousePos.Y <= cursorPos.Y + _gridSquareSize;
+        && mousePos.Y <= cursorPos.Y + _gridSquareSizePx;
 }

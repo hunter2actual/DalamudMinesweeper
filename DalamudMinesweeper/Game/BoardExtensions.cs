@@ -3,7 +3,8 @@ using System.Linq;
 namespace DalamudMinesweeper.Game;
 
 public static class BoardExtensions {
-    public static Board RevealAll(this Board board) {
+    public static Board RevealAll(this Board board)
+    {
         for (int x = 0; x < board.width; x++) {
             for (int y = 0; y < board.height; y++) {
                 board.cells[x, y].isRevealed = true;
@@ -12,7 +13,8 @@ public static class BoardExtensions {
         return board;
     }
 
-    public static Board HideAll(this Board board) {
+    public static Board HideAll(this Board board)
+    {
         for (int x = 0; x < board.width; x++) {
             for (int y = 0; y < board.height; y++) {
                 board.cells[x, y].isRevealed = false;
@@ -21,27 +23,32 @@ public static class BoardExtensions {
         return board;
     }
 
-    public static CellContents RevealCell(this Board board, int x, int y) {
+    public static CellContents RevealCell(this Board board, int x, int y)
+    {
         board.cells[x, y].isRevealed = true;
         return board.GetCellContents(x, y);
     }
 
-    public static CellContents GetCellContents(this Board board, int x, int y) {
+    public static CellContents GetCellContents(this Board board, int x, int y)
+    {
         return board.cells[x, y].contents;
     }
 
-    public static void SetCellContents(this Board board, int x, int y, CellContents contents) {
+    public static void SetCellContents(this Board board, int x, int y, CellContents contents)
+    {
         board.cells[x, y].contents = contents;
     }
 
-    public static bool ToggleCellFlag(this Board board, int x, int y) {
+    public static bool ToggleCellFlag(this Board board, int x, int y)
+    {
         if (board.cells[x, y].isRevealed) {
             return board.cells[x, y].isFlagged = false;
         }
         return board.cells[x, y].isFlagged = !board.cells[x, y].isFlagged;
     }
 
-    public static void RevealConnectedField(this Board board, int x, int y) {
+    public static void RevealConnectedField(this Board board, int x, int y)
+    {
         var currentCell = board.cells[x, y];
         if (currentCell.contents != CellContents.Clear || currentCell.isFlagged)
             return;
@@ -69,7 +76,8 @@ public static class BoardExtensions {
         return;
     }
 
-    public static bool IsVictory(this Board board) {
+    public static bool IsVictory(this Board board)
+    {
         var cells = board.cells.ToList();
 
         var bombsAreFlagged = cells

@@ -10,13 +10,11 @@ namespace DalamudMinesweeper.Components;
 
 public class Footer
 {
-    private readonly MinesweeperGame _game;
     private Configuration _configuration;
     private Action _drawConfigAction;
 
-    public Footer(MinesweeperGame game, Configuration configuration, Action drawConfigAction)
+    public Footer(Configuration configuration, Action drawConfigAction)
     {
-        _game = game;
         _configuration = configuration;
         _drawConfigAction = drawConfigAction;
     }
@@ -30,17 +28,15 @@ public class Footer
             _drawConfigAction();
         }        
         ImGui.SameLine();
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus)) {
+        if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
+        {
             _configuration.Zoom++;
         }
         ImGui.SameLine();
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Minus) && _configuration.Zoom > 1) {
+        if (ImGuiComponents.IconButton(FontAwesomeIcon.Minus) && _configuration.Zoom > 1)
+        {
             _configuration.Zoom--;
         };
         ImGui.SameLine();
-        if (_game.GameState is GameState.Victorious)
-            ImGui.Text("You Win!");
-        else if (_game.GameState is GameState.Boom)
-            ImGui.TextColored(ImGuiColors.DalamudRed, "YOU DIED");
     }
 }

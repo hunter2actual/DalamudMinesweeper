@@ -11,19 +11,19 @@ public class Configuration : IPluginConfiguration
     public int BoardWidth { get; set; } = 16;
     public int BoardHeight { get; set; } = 16;
     public int NumMines { get; set; } = 40;
-    public int Zoom { get; set; } = 3;
+    public int Zoom { get; set; } = 2;
 
     // the below exist just to make saving less cumbersome
     [NonSerialized]
-    private DalamudPluginInterface? PluginInterface;
+    private DalamudPluginInterface? _pluginInterface;
 
     public void Initialize(DalamudPluginInterface pluginInterface)
     {
-        this.PluginInterface = pluginInterface;
+        _pluginInterface = pluginInterface;
     }
 
     public void Save()
     {
-        this.PluginInterface!.SavePluginConfig(this);
+        _pluginInterface!.SavePluginConfig(this);
     }
 }

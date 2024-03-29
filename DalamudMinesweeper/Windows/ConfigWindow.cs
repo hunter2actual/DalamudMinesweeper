@@ -67,7 +67,7 @@ public class ConfigWindow : Window, IDisposable
         }
 
         if (ImGui.Button("Reset zoom level")) {
-            _configuration.Zoom = 3;
+            _configuration.Zoom = 2;
         }
 
         if (ImGui.Button("Save and Close")) {

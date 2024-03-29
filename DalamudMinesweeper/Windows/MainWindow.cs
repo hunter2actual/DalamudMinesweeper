@@ -47,7 +47,7 @@ public class MainWindow : Window, IDisposable
         _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
         _header = new Header(_game, _classicSprites, _configuration, () => InitialiseGame());
-        _footer = new Footer(_game, _configuration, plugin.DrawConfigUI);
+        _footer = new Footer(_configuration, plugin.DrawConfigUI);
     }
 
     public void Dispose()

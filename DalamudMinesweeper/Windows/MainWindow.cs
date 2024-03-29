@@ -13,7 +13,6 @@ namespace DalamudMinesweeper.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private readonly Plugin _plugin;
     private readonly ClassicSprites _classicSprites;
     private readonly Configuration _configuration;
     private MinesweeperGame _game;
@@ -27,6 +26,7 @@ public class MainWindow : Window, IDisposable
 
     private GameBoard _gameBoard;
     private Header _header;
+    private Footer _footer;
 
     public MainWindow(Plugin plugin, Configuration configuration): base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -40,7 +40,6 @@ public class MainWindow : Window, IDisposable
             MaximumSize = new Vector2(float.MaxValue, float.MaxValue)
         };
 
-        _plugin = plugin;
         _configuration = configuration;
         _classicSprites = new ClassicSprites(plugin.PluginInterface);
         _gridSquareSizePxVec2 = new Vector2(0, 0);
@@ -48,6 +47,7 @@ public class MainWindow : Window, IDisposable
         _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
         _header = new Header(_game, _classicSprites, _configuration, () => InitialiseGame());
+        _footer = new Footer(_game, _configuration, plugin.DrawConfigUI);
     }
 
     public void Dispose()
@@ -80,18 +80,19 @@ public class MainWindow : Window, IDisposable
         // Cover everything except the footer in an anticlick field
         ImGui.InvisibleButton("anticlick", bottomRight - topLeft - _footerHeightPx);
         
+        // draw everything
         var drawList = ImGui.GetWindowDrawList();
-        var cursorPos = windowPos + topLeft + _boardPaddingPx ;
+        var cursorPos = windowPos + topLeft + _boardPaddingPx;
 
         DrawBackground(drawList, cursorPos, new Vector2(0, headerHeightPx));
-        
+
         _header.Draw(cursorPos, topRight.X - topLeft.X);
         
         cursorPos += new Vector2(0, headerHeightPx);
 
         _gameBoard.Draw(cursorPos);
-
-        DrawFooter(bottomLeft - _footerHeightPx, bottomRight.X - bottomLeft.X);
+        
+        _footer.Draw(bottomLeft - _footerHeightPx);
     }
 
     private void DrawBackground(ImDrawListPtr drawList, Vector2 cursorPos, Vector2 headerHeightPx)
@@ -102,37 +103,6 @@ public class MainWindow : Window, IDisposable
             cursorPos - _boardPaddingPx,
             cursorPos + _gridSquareSizePx*_boardDimensions + _boardPaddingPx + headerHeightPx,
             backgroundColour);
-    }
-
-    private void DrawFooter(Vector2 start, float footerWidth)
-    {
-        ImGui.SetCursorPos(start);
-
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Cog))
-        {
-            _plugin.DrawConfigUI();
-        }        
-        ImGui.SameLine();
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus)) {
-            _configuration.Zoom++;
-        }
-        ImGui.SameLine();
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Minus) && _configuration.Zoom > 1) {
-            _configuration.Zoom--;
-        };
-        ImGui.SameLine();
-        if (_game.GameState is GameState.Victorious)
-            ImGui.Text("You Win!");
-        else if (_game.GameState is GameState.Boom)
-            ImGui.TextColored(ImGuiColors.DalamudRed, "YOU DIED");
-        ImGui.SameLine();
-        
-        var rightOffset = ImGui.CalcTextSize("New Game").X + _dalamudWindowPaddingPx;
-        ImGui.SetCursorPosX(start.X + footerWidth - rightOffset);
-        if (ImGui.Button("New Game"))
-        {
-            InitialiseGame();
-        }
     }
 
     private MinesweeperGame InitialiseGame()

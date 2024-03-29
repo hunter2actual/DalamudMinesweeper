@@ -18,7 +18,7 @@ public class BoardBuilder {
         _yStart = yStart;
 
         if (numMines > (width * height) - 9)
-            throw new("Too many bombs!");
+            throw new("Too many mines!");
     }
 
     public Board Build()
@@ -30,9 +30,9 @@ public class BoardBuilder {
         };
 
         board = PopulateCells(board);
-        board = PlaceBombs(board);
+        board = PlaceMines(board);
         board = SetLocations(board);
-        board = SetNeighbouringBombs(board);
+        board = SetNeighbouringMines(board);
         return board;
     }
 
@@ -56,13 +56,13 @@ public class BoardBuilder {
         return board;
     }
 
-    private Board PlaceBombs(Board board)
+    private Board PlaceMines(Board board)
     {
         var random = new Random();
-        var placedBombs = 0;
+        var placedMines = 0;
         Cell currentCell;
         
-        while (placedBombs < _numMines) {
+        while (placedMines < _numMines) {
             var x = random.Next(0, board.width);
             var y = random.Next(0, board.height);
 
@@ -76,7 +76,7 @@ public class BoardBuilder {
             if (currentCell.contents == CellContents.Mine)
                 continue;
             currentCell.contents = CellContents.Mine;
-            placedBombs++;
+            placedMines++;
         }
         return board;
     }
@@ -111,7 +111,7 @@ public class BoardBuilder {
         return board;
     }
 
-    private Board SetNeighbouringBombs(Board board)
+    private Board SetNeighbouringMines(Board board)
     {
         Cell currentCell;
         for (int x = 0; x < board.width; x++) {

@@ -1,3 +1,5 @@
+using System;
+
 namespace DalamudMinesweeper.Game;
 
 public record Board {

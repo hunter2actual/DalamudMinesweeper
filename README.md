@@ -6,10 +6,9 @@ Dalamud plugin for FFXIV
 
 ### Todos
 - Determine font scaling, button size etc and use when drawing UI
-- Smiley
-- Right and left click on number that has flags around it to clear unflagged adjacent squares
-- Split footer, header, gameboard into separate classes and clean up variables
-- High scores
+- UI elements for mine counter and clock
+- UI borders
+- High scores screen
 - UV Spritesheet?
 - [Stretch] Implement solver to reduce guessing
 - [Stretch] Skins

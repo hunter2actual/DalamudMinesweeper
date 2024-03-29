@@ -41,7 +41,7 @@ public class GameBoard
                         // TODO active click logic
                     }
                     else if (ImGui.IsMouseReleased(ImGuiMouseButton.Right)) {
-                        Game.Flag(x, y);
+                        Game.RightClick(x, y);
                     }
                 }
 

@@ -29,6 +29,7 @@ public class MinesweeperGame {
         }
 
         var contents = _board.GetCellContents(x, y);
+        var cell = GetCell(x, y);
         switch (contents) {
             case CellContents.Mine:
                 _board.RevealCell(x, y);
@@ -37,7 +38,14 @@ public class MinesweeperGame {
                 RevealAll();
                 break;
             case CellContents.Number:
-                _board.RevealCell(x, y);
+                if (cell.isRevealed && _board.CellIsFulfilled(x, y))
+                {
+                    _board.ClickAdjacentUnflaggedTiles(x, y, Click);
+                }
+                else if (!cell.isRevealed)
+                {
+                    _board.RevealCell(x, y);
+                }
                 break;
             case CellContents.Clear:
                 _board.RevealCell(x, y);
@@ -45,11 +53,11 @@ public class MinesweeperGame {
                 break;
         }
 
-        if(_board.IsVictory())
+        if(GameState is not GameState.Boom && _board.IsVictory())
             GameState = GameState.Victorious;
     }
 
-    public void Flag(int x, int y)
+    public void RightClick(int x, int y)
     {
         if (GameState != GameState.Playing || !_firstMoveTaken) return;
 

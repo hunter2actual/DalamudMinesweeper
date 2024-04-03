@@ -61,9 +61,9 @@ public class MainWindow : Window, IDisposable
     {
         // Calculate element sizes
         var windowPos = ImGui.GetWindowPos();
-        var headerHeightPx = _classicSprites.Smiley.Height * _configuration.Zoom;
+        var headerHeightPx = _classicSprites.SmileySize.Y * _configuration.Zoom;
 
-        _gridSquareSizePx = _classicSprites.Tile0.Width * _configuration.Zoom;
+        _gridSquareSizePx = (int) _classicSprites.TileSize.X * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
         _boardDimensions = new Vector2(_game.Width, _game.Height);
         var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx;

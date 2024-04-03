@@ -27,12 +27,12 @@ public class GameBoard
         var mousePos = ImGui.GetMousePos();
         var drawList = ImGui.GetWindowDrawList();
 
-        var gridSquareSizePx = _classicSprites.Tile0.Width * _configuration.Zoom;
+        var gridSquareSizePx = (int) _classicSprites.TileSize.X * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = gridSquareSizePx;
 
         for (int y = 0; y < Game.Height; y++) {
             for (int x = 0; x < Game.Width; x++) {
-                drawList.AddImage(GetCellImage(Game.GetCell(x, y)).ImGuiHandle, cursorPos, cursorPos + _gridSquareSizePxVec2);
+                _classicSprites.DrawTile(drawList, Game.GetCell(x, y), cursorPos, _configuration.Zoom);
 
                 if (MouseInSquare(mousePos, cursorPos, gridSquareSizePx) && ImGui.IsWindowFocused()) {
                     DrawHighlightSquare(drawList, cursorPos);
@@ -52,35 +52,35 @@ public class GameBoard
         }
     }
 
-    private IDalamudTextureWrap GetCellImage(Cell cell)
-    {
-        if (!cell.isRevealed)
-        {
-            if (cell.isFlagged)
-            {
-                return _classicSprites.TileFlag;
-            }
-            return _classicSprites.TileHidden;
-        }
-        return cell.contents switch
-        {
-            CellContents.Clear => _classicSprites.Tile0,
-            CellContents.Mine => _classicSprites.TileMine,
-            CellContents.ExplodedMine => _classicSprites.TileMineBoom,
-            CellContents.Number => cell.numNeighbouringMines switch {
-                1 => _classicSprites.Tile1,
-                2 => _classicSprites.Tile2,
-                3 => _classicSprites.Tile3,
-                4 => _classicSprites.Tile4,
-                5 => _classicSprites.Tile5,
-                6 => _classicSprites.Tile6,
-                7 => _classicSprites.Tile7,
-                8 => _classicSprites.Tile8,
-                _ => throw new("Invalid number of mines in cell " + cell.numNeighbouringMines)
-            },
-            _ => throw new("Unknown cell contents.")
-        };
-    }
+    // private IDalamudTextureWrap GetCellImage(Cell cell)
+    // {
+    //     if (!cell.isRevealed)
+    //     {
+    //         if (cell.isFlagged)
+    //         {
+    //             return _classicSprites.TileFlag;
+    //         }
+    //         return _classicSprites.TileHidden;
+    //     }
+    //     return cell.contents switch
+    //     {
+    //         CellContents.Clear => _classicSprites.Tile0,
+    //         CellContents.Mine => _classicSprites.TileMine,
+    //         CellContents.ExplodedMine => _classicSprites.TileMineBoom,
+    //         CellContents.Number => cell.numNeighbouringMines switch {
+    //             1 => _classicSprites.Tile1,
+    //             2 => _classicSprites.Tile2,
+    //             3 => _classicSprites.Tile3,
+    //             4 => _classicSprites.Tile4,
+    //             5 => _classicSprites.Tile5,
+    //             6 => _classicSprites.Tile6,
+    //             7 => _classicSprites.Tile7,
+    //             8 => _classicSprites.Tile8,
+    //             _ => throw new("Invalid number of mines in cell " + cell.numNeighbouringMines)
+    //         },
+    //         _ => throw new("Unknown cell contents.")
+    //     };
+    // }
     
     private void DrawHighlightSquare(ImDrawListPtr drawList, Vector2 cursorPos)
     {

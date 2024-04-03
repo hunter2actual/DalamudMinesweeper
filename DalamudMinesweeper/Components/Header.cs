@@ -27,18 +27,18 @@ public class Header
         var mousePos = ImGui.GetMousePos();
         var drawList = ImGui.GetWindowDrawList();
 
-        IDalamudTextureWrap smileyToDraw = _classicSprites.Smiley;
-        var smileySize = smileyToDraw.Size * _configuration.Zoom;
+        string smileyToDraw = "Smiley";
+        var smileySize = _classicSprites.SmileySize * _configuration.Zoom;
         float leftPadding = (float) ((headerWidth - smileySize.X) * 0.5);
         var cursorPos = start + new Vector2(leftPadding, 0);
 
         if (Game.GameState == GameState.Victorious)
         {
-            smileyToDraw = _classicSprites.SmileyShades;
+            smileyToDraw = "SmileyShades";
         }
         else if (Game.GameState == GameState.Boom)
         {
-            smileyToDraw = _classicSprites.SmileyDead;
+            smileyToDraw = "SmileyDead";
         }
 
         if (MouseInSquare(mousePos, cursorPos, (int) smileySize.X) 
@@ -46,24 +46,23 @@ public class Header
         {
             if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
-                smileyToDraw = _classicSprites.SmileyClicked;
+                smileyToDraw = "SmileyClicked";
                 _smileyClicked = true;
             }
             else if (ImGui.IsMouseDown(ImGuiMouseButton.Left) && _smileyClicked)
             {
-                smileyToDraw = _classicSprites.SmileyClicked;
+                smileyToDraw = "SmileyClicked";
             }
             else if (ImGui.IsMouseReleased(ImGuiMouseButton.Left) && _smileyClicked)
             {
-                smileyToDraw = _classicSprites.Smiley;
+                smileyToDraw = "Smiley";
                 _smileyClicked = false;
                 _initialiseGame();
             }
         }
         
         // TODO soyface when clicking on game
-
-        drawList.AddImage(smileyToDraw.ImGuiHandle, cursorPos, cursorPos + smileySize);
+        _classicSprites.DrawSmiley(drawList, smileyToDraw, cursorPos, _configuration.Zoom);
     }
 
     private bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos, int squareSize)

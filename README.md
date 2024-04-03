@@ -9,6 +9,6 @@ Dalamud plugin for FFXIV
 - UI elements for mine counter and clock
 - UI borders
 - High scores screen
-- UV Spritesheet?
+- UV Spritesheet incl 2x, 3x and 4x zoom - this will solve antialiasing issues. Include some transparency between images to prevent bleed
 - [Stretch] Implement solver to reduce guessing
 - [Stretch] Skins

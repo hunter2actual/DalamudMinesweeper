@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Numerics;
-using Dalamud.Interface;
-using Dalamud.Interface.Colors;
-using Dalamud.Interface.Components;
-using Dalamud.Interface.Internal;
 using Dalamud.Interface.Windowing;
 using DalamudMinesweeper.Components;
 using DalamudMinesweeper.Game;
@@ -16,14 +12,18 @@ public class MainWindow : Window, IDisposable
     private readonly ClassicSprites _classicSprites;
     private readonly Configuration _configuration;
     private MinesweeperGame _game;
+    private Vector2 _boardDimensions;
+
+    // Pixel sizes
+    private readonly int _dalamudWindowPaddingPx = 8;
     private int _gridSquareSizePx;
     private Vector2 _gridSquareSizePxVec2;
-    private Vector2 _boardDimensions;
-    private readonly Vector2 _boardPaddingPx = new Vector2(5, 5);
-    private readonly int _dalamudWindowPaddingPx = 8;
+    private readonly int _borderWidthPx = 9;
+    private readonly Vector2 _borderWidthPxVec2 = new(9, 9);
     private readonly int _titleBarHeightPx = 26;
-    private readonly Vector2 _footerHeightPx = new Vector2(0, 26);
+    private readonly Vector2 _footerHeightPxVec2 = new(0, 26);
 
+    // Renderable components
     private GameBoard _gameBoard;
     private Header _header;
     private Footer _footer;
@@ -64,9 +64,9 @@ public class MainWindow : Window, IDisposable
         _gridSquareSizePx = _classicSprites.Tile0.Width * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
         _boardDimensions = new Vector2(_game.Width, _game.Height);
-        var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_boardPaddingPx.X + 2*_dalamudWindowPaddingPx;
-        var windowHeightPx = _gridSquareSizePx*_boardDimensions.Y + 2*_boardPaddingPx.Y + 2*_dalamudWindowPaddingPx
-                            + _footerHeightPx.Y + headerHeightPx + _titleBarHeightPx + 8;
+        var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx;
+        var windowHeightPx = _gridSquareSizePx*_boardDimensions.Y + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx
+                            + _footerHeightPxVec2.Y + headerHeightPx + _titleBarHeightPx + 8;
         var windowSize = new Vector2(windowWidthPx, windowHeightPx);
         ImGui.SetWindowSize(windowSize);
 
@@ -77,32 +77,44 @@ public class MainWindow : Window, IDisposable
         var topRight = new Vector2(bottomRight.X, topLeft.Y);
         var bottomLeft = new Vector2(topLeft.X, bottomRight.Y);
 
-        // Cover everything except the footer in an anticlick field
-        ImGui.InvisibleButton("anticlick", bottomRight - topLeft - _footerHeightPx);
+        // Cover everything except the footer in an anticlick field to stop window movement
+        ImGui.InvisibleButton("anticlick", bottomRight - topLeft - _footerHeightPxVec2);
         
         // draw everything
         var drawList = ImGui.GetWindowDrawList();
-        var cursorPos = windowPos + topLeft + _boardPaddingPx;
+        var cursorPos = windowPos + topLeft;
 
         DrawBackground(drawList, cursorPos, new Vector2(0, headerHeightPx));
 
-        _header.Draw(cursorPos, topRight.X - topLeft.X);
+        cursorPos += _borderWidthPxVec2 * _configuration.Zoom;
+
+        var headerWidth = topRight.X - topLeft.X - 2*_borderWidthPx*_configuration.Zoom;
+        _header.Draw(cursorPos, headerWidth);
         
         cursorPos += new Vector2(0, headerHeightPx);
 
         _gameBoard.Draw(cursorPos);
         
-        _footer.Draw(bottomLeft - _footerHeightPx);
+        _footer.Draw(bottomLeft - _footerHeightPxVec2);
     }
 
     private void DrawBackground(ImDrawListPtr drawList, Vector2 cursorPos, Vector2 headerHeightPx)
     {
-        const uint backgroundColour = 0xFF808080; // ugly grey
+        var edgeBorderWidthPx = 3 * _configuration.Zoom;
 
-        drawList.AddRectFilled(
-            cursorPos - _boardPaddingPx,
-            cursorPos + _gridSquareSizePx*_boardDimensions + _boardPaddingPx + headerHeightPx,
-            backgroundColour);
+        var bgTopLeft = cursorPos;
+        var bgBottomRight = cursorPos + _gridSquareSizePx*_boardDimensions + 2*_borderWidthPxVec2*_configuration.Zoom + headerHeightPx;
+        var bgTopRight = new Vector2(bgBottomRight.X, bgTopLeft.Y);
+        var bgBottomLeft = new Vector2(bgTopLeft.X, bgBottomRight.Y);
+
+        // Background colour
+        drawList.AddRectFilled(bgTopLeft, bgBottomRight, Colours.MidGrey);
+
+        // Edges
+        drawList.AddRectFilled(bgTopLeft, bgBottomLeft + new Vector2(edgeBorderWidthPx, 0), Colours.White);
+        drawList.AddRectFilled(bgTopLeft, bgTopRight + new Vector2(0, edgeBorderWidthPx), Colours.White);
+        drawList.AddRectFilled(bgTopRight + new Vector2(-edgeBorderWidthPx, edgeBorderWidthPx), bgBottomRight, Colours.DarkGrey);
+        drawList.AddRectFilled(bgBottomLeft + new Vector2(edgeBorderWidthPx, -edgeBorderWidthPx), bgBottomRight, Colours.DarkGrey);
     }
 
     private MinesweeperGame InitialiseGame()
@@ -123,10 +135,4 @@ public class MainWindow : Window, IDisposable
 
         return _game;
     }
-
-    private bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos, int squareSize)
-        => mousePos.X > cursorPos.X
-        && mousePos.X <= cursorPos.X + squareSize
-        && mousePos.Y > cursorPos.Y
-        && mousePos.Y <= cursorPos.Y + squareSize;
 }

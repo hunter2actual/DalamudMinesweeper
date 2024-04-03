@@ -6,11 +6,10 @@ namespace DalamudMinesweeper.Components;
 
 public class Background
 {
-    private MinesweeperGame _game;
+    public MinesweeperGame Game;
     private Configuration _configuration;
     private int _borderWidthPx;
     private readonly Vector2 _borderWidthPxVec2;
-    private readonly Vector2 _boardDimensions;
 
     private readonly uint[,] _aliasSwatch = new uint[3,3]
     {
@@ -21,11 +20,10 @@ public class Background
 
     public Background(MinesweeperGame game, Configuration configuration, int borderWidthPx)
     {
-        _game = game;
+        Game = game;
         _configuration = configuration;
         _borderWidthPx = borderWidthPx;
         _borderWidthPxVec2 = new Vector2(_borderWidthPx, _borderWidthPx);
-        _boardDimensions = new Vector2(_game.Width, _game.Height);
     }
     
     public void Draw(Vector2 cursorPos, Vector2 headerHeightPx, int gridSquareSizePx)
@@ -33,9 +31,10 @@ public class Background
         var drawList = ImGui.GetWindowDrawList();
 
         var edgeBorderWidthPx = 3 * _configuration.Zoom;
+        var boardDimensions = new Vector2(Game.Width, Game.Height);
 
         var bgTopLeft = cursorPos;
-        var bgBottomRight = cursorPos + gridSquareSizePx*_boardDimensions + 2*_borderWidthPxVec2*_configuration.Zoom + headerHeightPx;
+        var bgBottomRight = cursorPos + gridSquareSizePx*boardDimensions + 2*_borderWidthPxVec2*_configuration.Zoom + headerHeightPx;
         var bgTopRight = new Vector2(bgBottomRight.X, bgTopLeft.Y);
         var bgBottomLeft = new Vector2(bgTopLeft.X, bgBottomRight.Y);
 

@@ -114,6 +114,10 @@ public class MainWindow : Window, IDisposable
         {
             _gameBoard.Game = _game;
         }
+        if (_background is not null) 
+        {
+            _background.Game = _game;
+        }
 
         return _game;
     }

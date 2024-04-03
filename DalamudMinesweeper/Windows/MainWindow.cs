@@ -27,6 +27,7 @@ public class MainWindow : Window, IDisposable
     private GameBoard _gameBoard;
     private Header _header;
     private Footer _footer;
+    private Background _background;
 
     public MainWindow(Plugin plugin, Configuration configuration): base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -48,6 +49,7 @@ public class MainWindow : Window, IDisposable
         _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
         _header = new Header(_game, _classicSprites, _configuration, () => InitialiseGame());
         _footer = new Footer(_configuration, plugin.DrawConfigUI);
+        _background = new Background(_game, _configuration, _borderWidthPx);
     }
 
     public void Dispose()
@@ -84,7 +86,8 @@ public class MainWindow : Window, IDisposable
         var drawList = ImGui.GetWindowDrawList();
         var cursorPos = windowPos + topLeft;
 
-        DrawBackground(drawList, cursorPos, new Vector2(0, headerHeightPx));
+        // DrawBackground(drawList, cursorPos, ;
+        _background.Draw(cursorPos, new Vector2(0, headerHeightPx), _gridSquareSizePx);
 
         cursorPos += _borderWidthPxVec2 * _configuration.Zoom;
 

@@ -16,6 +16,13 @@ public class Background
     private readonly Vector2 _borderWidthPxVec2;
     private readonly Vector2 _boardDimensions;
 
+    private readonly uint[,] _aliasSwatch = new uint[3,3]
+    {
+        { Colours.White,   Colours.White,    Colours.MidGrey  },
+        { Colours.White,   Colours.MidGrey,  Colours.DarkGrey },
+        { Colours.MidGrey, Colours.DarkGrey, Colours.DarkGrey }
+    };
+
     public Background(MinesweeperGame game, Configuration configuration, int borderWidthPx)
     {
         _game = game;
@@ -46,38 +53,26 @@ public class Background
         drawList.AddRectFilled(bgBottomLeft + new Vector2(edgeBorderWidthPx, -edgeBorderWidthPx), bgBottomRight, Colours.DarkGrey);
 
         // Corner aliasing
-        uint[,] aliasSwatch = new uint[3,3]
-        {
-            { Colours.White,   Colours.White,    Colours.MidGrey  },
-            { Colours.White,   Colours.MidGrey,  Colours.DarkGrey },
-            { Colours.MidGrey, Colours.DarkGrey, Colours.DarkGrey }
-        };
-
         var aliasingCursor = new Vector2(bgBottomLeft.X, bgBottomLeft.Y - 3*_configuration.Zoom);
-        var zoomedPixel = new Vector2(_configuration.Zoom, _configuration.Zoom);
-        for (int y = 0; y < 3; y++)
-        {
-            for (int x = 0; x < 3; x++)
-            {  
-                var colour = aliasSwatch[y,x];
-                var offset = new Vector2(_configuration.Zoom * x, _configuration.Zoom * y);
-                drawList.AddRectFilled(
-                    aliasingCursor + offset,
-                    aliasingCursor + offset + zoomedPixel,
-                    colour);
-            }
-        }
+        DrawAliasing(drawList, aliasingCursor);
 
         aliasingCursor = new Vector2(bgTopRight.X - 3*_configuration.Zoom, bgTopRight.Y);
+        DrawAliasing(drawList, aliasingCursor);
+    }
+
+    private void DrawAliasing(ImDrawListPtr drawList, Vector2 start)
+    {
+        var zoomedPixel = new Vector2(_configuration.Zoom, _configuration.Zoom);
+        
         for (int y = 0; y < 3; y++)
         {
             for (int x = 0; x < 3; x++)
             {  
-                var colour = aliasSwatch[y,x];
+                var colour = _aliasSwatch[y,x];
                 var offset = new Vector2(_configuration.Zoom * x, _configuration.Zoom * y);
                 drawList.AddRectFilled(
-                    aliasingCursor + offset,
-                    aliasingCursor + offset + zoomedPixel,
+                    start + offset,
+                    start + offset + zoomedPixel,
                     colour);
             }
         }

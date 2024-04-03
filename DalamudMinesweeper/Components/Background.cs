@@ -1,8 +1,4 @@
-using System;
 using System.Numerics;
-using Dalamud.Interface;
-using Dalamud.Interface.Colors;
-using Dalamud.Interface.Components;
 using DalamudMinesweeper.Game;
 using ImGuiNET;
 

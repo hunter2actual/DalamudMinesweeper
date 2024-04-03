@@ -40,6 +40,7 @@ public sealed class Plugin : IDalamudPlugin
         });
 
         PluginInterface.UiBuilder.Draw += DrawUI;
+        PluginInterface.UiBuilder.OpenMainUi += DrawMainUI;
         PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
     }
 
@@ -62,6 +63,11 @@ public sealed class Plugin : IDalamudPlugin
     private void DrawUI()
     {
         WindowSystem.Draw();
+    }
+
+    private void DrawMainUI()
+    {
+        _mainWindow.IsOpen = true;
     }
 
     public void DrawConfigUI()

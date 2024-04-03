@@ -115,6 +115,43 @@ public class MainWindow : Window, IDisposable
         drawList.AddRectFilled(bgTopLeft, bgTopRight + new Vector2(0, edgeBorderWidthPx), Colours.White);
         drawList.AddRectFilled(bgTopRight + new Vector2(-edgeBorderWidthPx, edgeBorderWidthPx), bgBottomRight, Colours.DarkGrey);
         drawList.AddRectFilled(bgBottomLeft + new Vector2(edgeBorderWidthPx, -edgeBorderWidthPx), bgBottomRight, Colours.DarkGrey);
+
+        // Corner aliasing
+        uint[,] aliasSwatch = new uint[3,3]
+        {
+            { Colours.White,   Colours.White,    Colours.MidGrey  },
+            { Colours.White,   Colours.MidGrey,  Colours.DarkGrey },
+            { Colours.MidGrey, Colours.DarkGrey, Colours.DarkGrey }
+        };
+
+        var aliasingCursor = new Vector2(bgBottomLeft.X, bgBottomLeft.Y - 3*_configuration.Zoom);
+        var zoomedPixel = new Vector2(_configuration.Zoom, _configuration.Zoom);
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {  
+                var colour = aliasSwatch[y,x];
+                var offset = new Vector2(_configuration.Zoom * x, _configuration.Zoom * y);
+                drawList.AddRectFilled(
+                    aliasingCursor + offset,
+                    aliasingCursor + offset + zoomedPixel,
+                    colour);
+            }
+        }
+
+        aliasingCursor = new Vector2(bgTopRight.X - 3*_configuration.Zoom, bgTopRight.Y);
+        for (int y = 0; y < 3; y++)
+        {
+            for (int x = 0; x < 3; x++)
+            {  
+                var colour = aliasSwatch[y,x];
+                var offset = new Vector2(_configuration.Zoom * x, _configuration.Zoom * y);
+                drawList.AddRectFilled(
+                    aliasingCursor + offset,
+                    aliasingCursor + offset + zoomedPixel,
+                    colour);
+            }
+        }
     }
 
     private MinesweeperGame InitialiseGame()

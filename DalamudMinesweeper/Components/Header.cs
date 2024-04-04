@@ -14,6 +14,7 @@ public class Header
     private readonly Configuration _configuration;
     private Action _initialiseGame;
     private bool _smileyClicked;
+    private readonly int _timerPadding = 6;
 
     public Header(MinesweeperGame game, TileSprites tileSprites, NumberSprites numberSprites, Configuration configuration, Action initialiseGame)
     {
@@ -26,9 +27,25 @@ public class Header
 
     public void Draw(Vector2 start, float headerWidth)
     {
-        var mousePos = ImGui.GetMousePos();
         var drawList = ImGui.GetWindowDrawList();
 
+        DrawSmiley(start, drawList, headerWidth);
+
+        if (Game.Width >= 8)
+        {
+            var cursorPos = start + Vector2.UnitX*_timerPadding*_configuration.Zoom;
+            DrawNumUnflaggedMines(cursorPos, drawList);
+
+            cursorPos = start 
+                + Vector2.UnitX
+                    * (headerWidth - (2 + _timerPadding + 3*_numberSprites.NumberSize.X)*_configuration.Zoom);
+            DrawTimer(cursorPos, drawList);
+        }
+    }
+
+    private void DrawSmiley(Vector2 start, ImDrawListPtr drawList, float headerWidth)
+    {
+        var mousePos = ImGui.GetMousePos();
         string smileyToDraw = "Smiley";
         var smileySize = _tileSprites.SmileySize * _configuration.Zoom;
         float leftPadding = (float) ((headerWidth - smileySize.X) * 0.5);
@@ -65,14 +82,6 @@ public class Header
         
         // TODO soyface when clicking on game
         _tileSprites.DrawSmiley(drawList, smileyToDraw, cursorPos, _configuration.Zoom);
-
-        if (Game.Width >= 8)
-        {
-            cursorPos += Vector2.UnitX*30*_configuration.Zoom;
-            DrawNumUnflaggedMines(cursorPos, drawList);
-            cursorPos += Vector2.UnitX*40*_configuration.Zoom;
-            // DrawTimer(cursorPos, drawList);
-        }
     }
 
     private static bool MouseInSquare(Vector2 mousePos, Vector2 cursorPos, int squareSize)

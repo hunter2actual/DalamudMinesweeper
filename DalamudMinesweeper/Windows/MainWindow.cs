@@ -3,13 +3,16 @@ using System.Numerics;
 using Dalamud.Interface.Windowing;
 using DalamudMinesweeper.Components;
 using DalamudMinesweeper.Game;
+using DalamudMinesweeper.Sprites;
 using ImGuiNET;
 
 namespace DalamudMinesweeper.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    private readonly ClassicSprites _classicSprites;
+    private readonly TileSprites _tileSprites;
+    private readonly NumberSprites _numberSprites;
+
     private readonly Configuration _configuration;
     private MinesweeperGame _game;
     private Vector2 _boardDimensions;
@@ -43,12 +46,13 @@ public class MainWindow : Window, IDisposable
         };
 
         _configuration = configuration;
-        _classicSprites = new ClassicSprites(plugin.PluginInterface);
+        _tileSprites = new TileSprites(plugin.PluginInterface);
+        _numberSprites = new NumberSprites(plugin.PluginInterface);
         _gridSquareSizePxVec2 = new Vector2(0, 0);
 
         _game = InitialiseGame();
-        _gameBoard = new GameBoard(_game, _classicSprites, _configuration);
-        _header = new Header(_game, _classicSprites, _configuration, () => InitialiseGame());
+        _gameBoard = new GameBoard(_game, _tileSprites, _configuration);
+        _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
         _footer = new Footer(_configuration, plugin.DrawConfigUI);
         _background = new Background(_game, _configuration, _borderWidthPx);
         _drawBoard = true;
@@ -56,16 +60,17 @@ public class MainWindow : Window, IDisposable
 
     public void Dispose()
     {
-        _classicSprites.Dispose();
+        _tileSprites.Dispose();
+        _numberSprites.Dispose();
     }
 
     public override void Draw()
     {
         // Calculate element sizes
         var windowPos = ImGui.GetWindowPos();
-        var headerHeightPx = (_classicSprites.SmileySize.Y + 10)* _configuration.Zoom;
+        var headerHeightPx = (_tileSprites.SmileySize.Y + 10)* _configuration.Zoom;
 
-        _gridSquareSizePx = (int) _classicSprites.TileSize.X * _configuration.Zoom;
+        _gridSquareSizePx = (int) _tileSprites.TileSize.X * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
         _boardDimensions = new Vector2(_game.Width, _game.Height);
         var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx;

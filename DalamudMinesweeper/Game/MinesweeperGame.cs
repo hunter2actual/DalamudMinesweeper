@@ -1,3 +1,7 @@
+using System;
+using System.Diagnostics;
+using System.Linq;
+
 namespace DalamudMinesweeper.Game;
 
 public class MinesweeperGame {
@@ -8,6 +12,7 @@ public class MinesweeperGame {
     private Board _board;
     public GameState GameState { get; private set; }
     private bool _firstMoveTaken;
+    private Stopwatch stopwatch;
 
     public MinesweeperGame(int width, int height, int numMines)
     {
@@ -16,6 +21,7 @@ public class MinesweeperGame {
         _boardBuilder = new BoardBuilder(width, height, numMines);
         _board = _boardBuilder.Build();
         GameState = GameState.Playing;
+        stopwatch = new Stopwatch();
     }
 
     public void Click(int x, int y)
@@ -26,6 +32,7 @@ public class MinesweeperGame {
             _boardBuilder.WithClearPosition(x, y);
             _board = _boardBuilder.Build();
             _firstMoveTaken = true;
+            stopwatch.Start();
         }
 
         var contents = _board.GetCellContents(x, y);
@@ -35,6 +42,7 @@ public class MinesweeperGame {
                 _board.RevealCell(x, y);
                 GameState = GameState.Boom;
                 _board.SetCellContents(x, y, CellContents.ExplodedMine);
+                stopwatch.Stop();
                 RevealAll();
                 break;
             case CellContents.Number:
@@ -72,4 +80,14 @@ public class MinesweeperGame {
     public void HideAll() => _board.HideAll();
 
     public Cell GetCell(int x, int y) => _board.cells[x, y];
+
+    public int NumUnflaggedMines()
+    {
+        var cells = _board.cells.ToList();
+
+        return cells.Count(c => c.contents is CellContents.Mine or CellContents.ExplodedMine)
+             - cells.Count(c => c.isFlagged);
+    }
+
+    public int ElapsedGameTime => (int) stopwatch.Elapsed.TotalSeconds;
 }

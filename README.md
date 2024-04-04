@@ -6,7 +6,7 @@ Dalamud plugin for FFXIV
 
 ### Todos
 - Complete header with mine counter and clock
-- Active click logic
+- Active click logic (tile depression and shocked smiley)
 - High scores screen
 - [Stretch] Implement solver to reduce guessing
 - [Stretch] Skins

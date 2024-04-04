@@ -14,23 +14,43 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\Data\Classic\spritesheet_1x.png">
+    <Content Include="..\Sprites\spritesheet_1x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
-    <Content Include="..\Data\Classic\spritesheet_2x.png">
+    <Content Include="..\Sprites\spritesheet_2x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
-    <Content Include="..\Data\Classic\spritesheet_3x.png">
+    <Content Include="..\Sprites\spritesheet_3x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
-    <Content Include="..\Data\Classic\spritesheet_4x.png">
+    <Content Include="..\Sprites\spritesheet_4x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
-    <Content Include="..\Data\Classic\spritesheet_5x.png">
+    <Content Include="..\Sprites\spritesheet_5x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Sprites\numbers_1x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Sprites\numbers_2x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Sprites\numbers_3x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Sprites\numbers_4x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Sprites\numbers_5x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>

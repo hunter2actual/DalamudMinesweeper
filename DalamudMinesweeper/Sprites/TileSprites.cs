@@ -7,15 +7,16 @@ using System.Numerics;
 using System.Collections.Generic;
 using DalamudMinesweeper.Game;
 
-namespace DalamudMinesweeper;
+namespace DalamudMinesweeper.Sprites;
 
-public class ClassicSprites : IDisposable {
+public class TileSprites : IDisposable
+{
     private DalamudPluginInterface _pluginInterface { get; set; }
     private IDalamudTextureWrap[] Sheets { get; init; }
     private record SpriteData(Vector2 topLeftCoord, Vector2 sizePx);
     private readonly Dictionary<string, SpriteData> _spriteDict;
 
-    public ClassicSprites(DalamudPluginInterface pluginInterface)
+    public TileSprites(DalamudPluginInterface pluginInterface)
     {
         _pluginInterface = pluginInterface;
 
@@ -111,5 +112,4 @@ public class ClassicSprites : IDisposable {
         var fullPath = Path.Combine(_pluginInterface.AssemblyLocation.Directory?.FullName!, path);
         return _pluginInterface.UiBuilder.LoadImage(fullPath);
     }
-
 }

@@ -96,7 +96,7 @@ public class MainWindow : Window, IDisposable
 
         cursorPos += _borderWidthPxVec2 * _configuration.Zoom;
 
-        var headerWidth = (int) (topRight.X - topLeft.X - 2*_borderWidthPx*_configuration.Zoom);
+        var headerWidth = (int) (topRight.X - topLeft.X - (2*_borderWidthPx - 1)*_configuration.Zoom);
         _header.Draw(cursorPos, headerWidth, headerHeightPx);
         
         cursorPos += Vector2.UnitY*(headerHeightPx + (_borderWidthPx-1)*_configuration.Zoom);

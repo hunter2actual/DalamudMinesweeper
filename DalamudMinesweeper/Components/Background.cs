@@ -42,7 +42,8 @@ public class Background
         var boardSizePxVec2 = gridSquareSizePx*boardDimensions; // (already zoomed before being passed in)
 
         var bgTopLeft = cursorPos;
-        var bgBottomRight = cursorPos + boardSizePxVec2 + 2*_borderWidthPxVec2*_configuration.Zoom + headerHeightPxVec2;
+        var bgBottomRight = cursorPos + boardSizePxVec2 + 2*_borderWidthPxVec2*_configuration.Zoom
+            + headerHeightPxVec2 + Vector2.UnitY*(_borderWidthPx-1)*_configuration.Zoom;
         var bgTopRight = new Vector2(bgBottomRight.X, bgTopLeft.Y);
         var bgBottomLeft = new Vector2(bgTopLeft.X, bgBottomRight.Y);
 
@@ -65,7 +66,8 @@ public class Background
 
         // Inner edges around board
         // Technically these vars are the corners of board + the edge we are drawing
-        var boardTopLeft = bgTopLeft + headerHeightPxVec2 + _borderWidthPxVec2*_configuration.Zoom - Vector2.One*borderEdgeWidthPx;
+        var boardTopLeft = bgTopLeft + headerHeightPxVec2 + _borderWidthPxVec2*_configuration.Zoom
+            - Vector2.One*borderEdgeWidthPx + Vector2.UnitY*(_borderWidthPx-1)*_configuration.Zoom;
         var boardBottomRight = boardTopLeft + boardSizePxVec2 + 2*Vector2.One*borderEdgeWidthPx;
         var boardBottomLeft = new Vector2(boardTopLeft.X, boardBottomRight.Y);
         var boardTopRight = new Vector2(boardBottomRight.X, boardTopLeft.Y);

@@ -68,14 +68,14 @@ public class MainWindow : Window, IDisposable
     {
         // Calculate element sizes
         var windowPos = ImGui.GetWindowPos();
-        var headerHeightPx = (_tileSprites.SmileySize.Y + 10)* _configuration.Zoom;
+        var headerHeightPx = (int) (_tileSprites.SmileySize.Y + 8)* _configuration.Zoom;
 
         _gridSquareSizePx = (int) _tileSprites.TileSize.X * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
         _boardDimensions = new Vector2(_game.Width, _game.Height);
         var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx;
         var windowHeightPx = _gridSquareSizePx*_boardDimensions.Y + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx
-                            + _footerHeightPxVec2.Y + headerHeightPx + _titleBarHeightPx + 8;
+                            + _footerHeightPxVec2.Y + headerHeightPx + _borderWidthPx*_configuration.Zoom + _titleBarHeightPx + 6; // this shit feels like I'm doing CSS 🤮
         var windowSize = new Vector2(windowWidthPx, windowHeightPx);
         ImGui.SetWindowSize(windowSize);
 
@@ -96,10 +96,10 @@ public class MainWindow : Window, IDisposable
 
         cursorPos += _borderWidthPxVec2 * _configuration.Zoom;
 
-        var headerWidth = topRight.X - topLeft.X - 2*_borderWidthPx*_configuration.Zoom;
-        _header.Draw(cursorPos, headerWidth);
+        var headerWidth = (int) (topRight.X - topLeft.X - 2*_borderWidthPx*_configuration.Zoom);
+        _header.Draw(cursorPos, headerWidth, headerHeightPx);
         
-        cursorPos += Vector2.UnitY*headerHeightPx;
+        cursorPos += Vector2.UnitY*(headerHeightPx + (_borderWidthPx-1)*_configuration.Zoom);
 
         if (_drawBoard)
             _gameBoard.Draw(cursorPos);

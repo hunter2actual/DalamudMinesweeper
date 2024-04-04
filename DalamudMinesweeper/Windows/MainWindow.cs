@@ -18,8 +18,8 @@ public class MainWindow : Window, IDisposable
     private readonly int _dalamudWindowPaddingPx = 8;
     private int _gridSquareSizePx;
     private Vector2 _gridSquareSizePxVec2;
-    private readonly int _borderWidthPx = 9;
-    private readonly Vector2 _borderWidthPxVec2 = new(9, 9);
+    private readonly int _borderWidthPx = 12;
+    private readonly Vector2 _borderWidthPxVec2 = new(12, 12);
     private readonly int _titleBarHeightPx = 26;
     private readonly Vector2 _footerHeightPxVec2 = new(0, 26);
 
@@ -28,6 +28,7 @@ public class MainWindow : Window, IDisposable
     private Header _header;
     private Footer _footer;
     private Background _background;
+    private bool _drawBoard;
 
     public MainWindow(Plugin plugin, Configuration configuration) : base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -50,6 +51,7 @@ public class MainWindow : Window, IDisposable
         _header = new Header(_game, _classicSprites, _configuration, () => InitialiseGame());
         _footer = new Footer(_configuration, plugin.DrawConfigUI);
         _background = new Background(_game, _configuration, _borderWidthPx);
+        _drawBoard = true;
     }
 
     public void Dispose()
@@ -61,7 +63,7 @@ public class MainWindow : Window, IDisposable
     {
         // Calculate element sizes
         var windowPos = ImGui.GetWindowPos();
-        var headerHeightPx = _classicSprites.SmileySize.Y * _configuration.Zoom;
+        var headerHeightPx = (_classicSprites.SmileySize.Y + 10)* _configuration.Zoom;
 
         _gridSquareSizePx = (int) _classicSprites.TileSize.X * _configuration.Zoom;
         _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
@@ -85,18 +87,21 @@ public class MainWindow : Window, IDisposable
         // draw everything
         var cursorPos = windowPos + topLeft;
 
-        _background.Draw(cursorPos, new Vector2(0, headerHeightPx), _gridSquareSizePx);
+        _background.Draw(cursorPos, Vector2.UnitY*headerHeightPx, _gridSquareSizePx);
 
         cursorPos += _borderWidthPxVec2 * _configuration.Zoom;
 
         var headerWidth = topRight.X - topLeft.X - 2*_borderWidthPx*_configuration.Zoom;
         _header.Draw(cursorPos, headerWidth);
         
-        cursorPos += new Vector2(0, headerHeightPx);
+        cursorPos += Vector2.UnitY*headerHeightPx;
 
-        _gameBoard.Draw(cursorPos);
+        if (_drawBoard)
+            _gameBoard.Draw(cursorPos);
         
         _footer.Draw(bottomLeft - _footerHeightPxVec2);
+
+        if (ImGui.Checkbox("Draw board", ref _drawBoard)) {}
     }
 
     private MinesweeperGame InitialiseGame()

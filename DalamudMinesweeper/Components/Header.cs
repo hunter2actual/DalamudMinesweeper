@@ -29,7 +29,7 @@ public class Header
         string smileyToDraw = "Smiley";
         var smileySize = _classicSprites.SmileySize * _configuration.Zoom;
         float leftPadding = (float) ((headerWidth - smileySize.X) * 0.5);
-        var cursorPos = start + new Vector2(leftPadding, 0);
+        var cursorPos = start + Vector2.UnitX*leftPadding;
 
         if (Game.GameState == GameState.Victorious)
         {

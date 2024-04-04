@@ -14,7 +14,7 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(350, 200);
+        Size = new Vector2(350, 220);
         SizeCondition = ImGuiCond.Always;
 
         _configuration = plugin.Configuration;
@@ -70,6 +70,10 @@ public class ConfigWindow : Window, IDisposable
 
         if (ImGui.Button("Reset zoom level")) {
             _configuration.Zoom = 2;
+        }
+
+        if (ImGui.Button("Clear scores")) {
+            _configuration.Scores = new Game.Scores([]);
         }
 
         if (ImGui.Button("Save and Close")) {

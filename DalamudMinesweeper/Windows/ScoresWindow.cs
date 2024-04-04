@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
@@ -13,9 +12,7 @@ public class ScoresWindow : Window, IDisposable
     private Configuration _configuration;
 
     public ScoresWindow(Plugin plugin) : base(
-        "Minesweeper High Scores",
-        ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
-        ImGuiWindowFlags.NoScrollWithMouse)
+        "Minesweeper High Scores")
     {
         Size = new Vector2(350, 400);
         SizeCondition = ImGuiCond.Always;
@@ -26,7 +23,7 @@ public class ScoresWindow : Window, IDisposable
     public void Dispose() { }
 
     public override void Draw()
-    {       
+    {
         if (_configuration.Scores is null)
             _configuration.Scores = new Scores([]);
 

@@ -11,14 +11,22 @@ namespace DalamudMinesweeper;
 
 public class ClassicSprites : IDisposable {
     private DalamudPluginInterface _pluginInterface { get; set; }
-    private IDalamudTextureWrap Sheet { get; init; }
+    private IDalamudTextureWrap[] Sheets { get; init; }
     private record SpriteData(Vector2 topLeftCoord, Vector2 sizePx);
     private readonly Dictionary<string, SpriteData> _spriteDict;
 
     public ClassicSprites(DalamudPluginInterface pluginInterface)
     {
         _pluginInterface = pluginInterface;
-        Sheet = LoadImage("spritesheet.png");
+
+        Sheets =
+        [
+            LoadImage("spritesheet_1x.png"),
+            LoadImage("spritesheet_2x.png"),
+            LoadImage("spritesheet_3x.png"),
+            LoadImage("spritesheet_4x.png"),
+            LoadImage("spritesheet_5x.png"),
+        ];
 
         _spriteDict = new Dictionary<string, SpriteData>
         {
@@ -54,11 +62,13 @@ public class ClassicSprites : IDisposable {
 
     private void Draw(ImDrawListPtr drawList, SpriteData sprite, Vector2 cursorPos, int zoom)
     {
-        var uvMin = sprite.topLeftCoord / Sheet.Size;
-        var uvMax = (sprite.topLeftCoord + sprite.sizePx) / Sheet.Size;
+        var sheet = Sheets[zoom - 1];
+
+        var uvMin = sprite.topLeftCoord * zoom / sheet.Size;
+        var uvMax = (sprite.topLeftCoord + sprite.sizePx) * zoom / sheet.Size;
 
         drawList.AddImage(
-            Sheet.ImGuiHandle,
+            sheet.ImGuiHandle,
             cursorPos,
             cursorPos + sprite.sizePx * zoom,
             uvMin,
@@ -90,7 +100,10 @@ public class ClassicSprites : IDisposable {
 
     public void Dispose()
     {
-        Sheet.Dispose();
+        foreach (var sheet in Sheets)
+        {
+            sheet.Dispose();
+        }
     }
 
     private IDalamudTextureWrap LoadImage(string path)

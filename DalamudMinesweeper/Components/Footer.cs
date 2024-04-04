@@ -28,7 +28,7 @@ public class Footer
             _drawConfigAction();
         }        
         ImGui.SameLine();
-        if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus))
+        if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus) && _configuration.Zoom <= 5)
         {
             _configuration.Zoom++;
         }

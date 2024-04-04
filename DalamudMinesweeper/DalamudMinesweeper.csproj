@@ -5,7 +5,7 @@
   <PropertyGroup>
     <Authors></Authors>
     <Company></Company>
-    <Version>0.0.0.13</Version>
+    <Version>0.0.0.14</Version>
     <Description>A logic puzzle featuring hidden mines.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/hunter2actual/DalamudMinesweeper</PackageProjectUrl>
@@ -14,7 +14,23 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\Data\Classic\spritesheet.png">
+    <Content Include="..\Data\Classic\spritesheet_1x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Data\Classic\spritesheet_2x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Data\Classic\spritesheet_3x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Data\Classic\spritesheet_4x.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Visible>false</Visible>
+    </Content>
+    <Content Include="..\Data\Classic\spritesheet_5x.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>

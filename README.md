@@ -10,6 +10,5 @@ Dalamud plugin for FFXIV
 - UI borders
 - Active click logic
 - High scores screen
-- Spritesheet zoom levels
 - [Stretch] Implement solver to reduce guessing
 - [Stretch] Skins

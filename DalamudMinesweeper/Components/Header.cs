@@ -1,6 +1,5 @@
 using System;
 using System.Numerics;
-using Dalamud.Interface.Internal;
 using DalamudMinesweeper.Game;
 using ImGuiNET;
 

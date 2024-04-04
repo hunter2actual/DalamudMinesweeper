@@ -48,6 +48,7 @@ public class ConfigWindow : Window, IDisposable
         if (ImGui.InputInt("Board width", ref width))
         {
             if (width <= 4) width = 4;
+            if (width > 99) width = 99;
             _configuration.BoardWidth = width;            
         }
 
@@ -55,6 +56,7 @@ public class ConfigWindow : Window, IDisposable
         if (ImGui.InputInt("Board height", ref height))
         {
             if (height <= 4) height = 4;
+            if (height > 99) height = 99;
             _configuration.BoardHeight = height;            
         }
 

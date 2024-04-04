@@ -31,7 +31,6 @@ public class MainWindow : Window, IDisposable
     private Header _header;
     private Footer _footer;
     private Background _background;
-    private bool _drawBoard;
 
     public MainWindow(Plugin plugin, Configuration configuration) : base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
@@ -55,7 +54,6 @@ public class MainWindow : Window, IDisposable
         _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
         _footer = new Footer(_configuration, plugin.DrawConfigUI);
         _background = new Background(_game, _configuration, _borderWidthPx);
-        _drawBoard = true;
     }
 
     public void Dispose()
@@ -101,12 +99,9 @@ public class MainWindow : Window, IDisposable
         
         cursorPos += Vector2.UnitY*(headerHeightPx + (_borderWidthPx-1)*_configuration.Zoom);
 
-        if (_drawBoard)
-            _gameBoard.Draw(cursorPos);
+        _gameBoard.Draw(cursorPos);
         
         _footer.Draw(bottomLeft - _footerHeightPxVec2);
-
-        if (ImGui.Checkbox("Draw board", ref _drawBoard)) {}
     }
 
     private MinesweeperGame InitialiseGame()

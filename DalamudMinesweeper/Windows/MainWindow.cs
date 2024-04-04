@@ -16,6 +16,7 @@ public class MainWindow : Window, IDisposable
     private readonly Configuration _configuration;
     private MinesweeperGame _game;
     private Vector2 _boardDimensions;
+    private bool _canSaveScore; // latching to solve debounce
 
     // Pixel sizes
     private readonly int _dalamudWindowPaddingPx = 8;
@@ -52,7 +53,7 @@ public class MainWindow : Window, IDisposable
         _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _tileSprites, _configuration);
         _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
-        _footer = new Footer(_configuration, plugin.DrawConfigUI);
+        _footer = new Footer(_configuration, plugin.DrawConfigUI, plugin.DrawScoresUI);
         _background = new Background(_game, _configuration, _borderWidthPx);
     }
 
@@ -109,7 +110,8 @@ public class MainWindow : Window, IDisposable
         _game = new MinesweeperGame(
             _configuration.BoardWidth,
             _configuration.BoardHeight,
-            _configuration.NumMines);
+            _configuration.NumMines,
+            RecordScore);
 
         if (_header is not null) 
         {
@@ -124,6 +126,21 @@ public class MainWindow : Window, IDisposable
             _background.Game = _game;
         }
 
+        _canSaveScore = true;
+
         return _game;
+    }
+
+    private void RecordScore()
+    {
+        var gameParameters = new GameParameters(_game.Height, _game.Width, _game.NumMines);
+        var time = _game.ElapsedGameTimeMs;
+
+        if (_canSaveScore)
+        {
+            _configuration.Scores.scores.Add((gameParameters, time));
+            _configuration.Save();
+            _canSaveScore = false;
+        }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Dalamud.Configuration;
 using Dalamud.Plugin;
+using DalamudMinesweeper.Game;
 using System;
+using System.Collections.Generic;
 
 namespace DalamudMinesweeper;
 
@@ -12,6 +14,8 @@ public class Configuration : IPluginConfiguration
     public int BoardHeight { get; set; } = 16;
     public int NumMines { get; set; } = 40;
     public int Zoom { get; set; } = 2;
+
+    public Scores Scores { get; set; } = new Scores([]);
 
     // the below exist just to make saving less cumbersome
     [NonSerialized]

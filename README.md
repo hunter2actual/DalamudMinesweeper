@@ -13,6 +13,5 @@ How to play
 
 ### Todos
 - Active click logic (tile depression and shocked smiley)
-- High scores screen
 - Implement solver and noguess mode
 - [Stretch] Skins

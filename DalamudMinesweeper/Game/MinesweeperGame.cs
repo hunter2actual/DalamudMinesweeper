@@ -8,20 +8,24 @@ public class MinesweeperGame {
 
     public int Width { get; init; }
     public int Height { get; init; }
+    public int NumMines { get; init; }
     private BoardBuilder _boardBuilder;
     private Board _board;
     public GameState GameState { get; private set; }
     private bool _firstMoveTaken;
     private Stopwatch _stopwatch;
+    private Action _onVictory;
 
-    public MinesweeperGame(int width, int height, int numMines)
+    public MinesweeperGame(int width, int height, int numMines, Action onVictory)
     {
         Width = width;
         Height = height;
+        NumMines = numMines;
         _boardBuilder = new BoardBuilder(width, height, numMines);
         _board = _boardBuilder.Build();
         GameState = GameState.Playing;
         _stopwatch = new Stopwatch();
+        _onVictory = onVictory;
     }
 
     public void Click(int x, int y)
@@ -61,11 +65,7 @@ public class MinesweeperGame {
                 break;
         }
 
-        if(GameState is not GameState.Boom && _board.IsVictory())
-        {
-            GameState = GameState.Victorious;
-            _stopwatch.Stop();
-        }
+        if(GameState is not GameState.Boom && _board.IsVictory()) Win();
     }
 
     public void RightClick(int x, int y)
@@ -74,11 +74,14 @@ public class MinesweeperGame {
 
         _board.ToggleCellFlag(x, y);
 
-        if(_board.IsVictory())
-        {
-            GameState = GameState.Victorious;
-            _stopwatch.Stop();
-        }
+        if(_board.IsVictory()) Win();
+    }
+
+    public void Win()
+    {
+        GameState = GameState.Victorious;
+        _onVictory();
+        _stopwatch.Stop();
     }
 
     public void RevealAll() => _board.RevealAll();
@@ -96,4 +99,5 @@ public class MinesweeperGame {
     }
 
     public int ElapsedGameTime => (int) _stopwatch.Elapsed.TotalSeconds;
+    public long ElapsedGameTimeMs => _stopwatch.ElapsedMilliseconds;
 }

@@ -10,17 +10,24 @@ public class Footer
 {
     private Configuration _configuration;
     private Action _drawConfigAction;
+    private Action _drawScoresAction;
 
-    public Footer(Configuration configuration, Action drawConfigAction)
+    public Footer(Configuration configuration, Action drawConfigAction, Action drawScoresAction)
     {
         _configuration = configuration;
         _drawConfigAction = drawConfigAction;
+        _drawScoresAction = drawScoresAction;
     }
 
     public void Draw(Vector2 start)
     {
         ImGui.SetCursorPos(start);
 
+        if (ImGuiComponents.IconButton(FontAwesomeIcon.ListOl))
+        {
+            _drawScoresAction();
+        };
+        ImGui.SameLine();
         if (ImGuiComponents.IconButton(FontAwesomeIcon.Cog))
         {
             _drawConfigAction();

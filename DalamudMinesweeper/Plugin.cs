@@ -15,8 +15,9 @@ public sealed class Plugin : IDalamudPlugin
     public Configuration Configuration { get; init; }
     public WindowSystem WindowSystem = new("Minesweeper");
     private ConfigWindow _configWindow { get; init; }
-    private ICommandManager _commandManager { get; init; }
+    private ScoresWindow _scoresWindow { get; init; }
     private MainWindow _mainWindow { get; init; }
+    private ICommandManager _commandManager { get; init; }
 
     public Plugin(
         [RequiredVersion("1.0")] DalamudPluginInterface pluginInterface,
@@ -29,9 +30,11 @@ public sealed class Plugin : IDalamudPlugin
         Configuration.Initialize(PluginInterface);
 
         _configWindow = new ConfigWindow(this);
+        _scoresWindow = new ScoresWindow(this);
         _mainWindow = new MainWindow(this, Configuration);
         
         WindowSystem.AddWindow(_configWindow);
+        WindowSystem.AddWindow(_scoresWindow);
         WindowSystem.AddWindow(_mainWindow);
 
         _commandManager.AddHandler(CommandName, new CommandInfo(OnCommand)
@@ -73,5 +76,10 @@ public sealed class Plugin : IDalamudPlugin
     public void DrawConfigUI()
     {
         _configWindow.IsOpen = true;
+    }
+
+    public void DrawScoresUI()
+    {
+        _scoresWindow.IsOpen = true;
     }
 }

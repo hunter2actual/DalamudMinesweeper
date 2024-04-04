@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace DalamudMinesweeper.Game;
 
 public record Board {
@@ -19,3 +21,7 @@ public enum CellContents { Clear, Number, Mine, ExplodedMine }
 public enum CellLocation { Middle, Edge, Corner }
 
 public enum GameState { Playing, Victorious, Boom }
+
+public record Scores(List<(GameParameters parameters, long time)> scores);
+
+public record GameParameters(int width, int height, int numMines);

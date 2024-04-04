@@ -5,7 +5,7 @@
   <PropertyGroup>
     <Authors></Authors>
     <Company></Company>
-    <Version>0.0.0.17</Version>
+    <Version>0.0.0.18</Version>
     <Description>A logic puzzle featuring hidden mines.</Description>
     <Copyright></Copyright>
     <PackageProjectUrl>https://github.com/hunter2actual/DalamudMinesweeper</PackageProjectUrl>

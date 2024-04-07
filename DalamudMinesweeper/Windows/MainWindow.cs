@@ -3,7 +3,7 @@ using System.Numerics;
 using Dalamud.Interface.Windowing;
 using DalamudMinesweeper.Components;
 using DalamudMinesweeper.Game;
-using DalamudMinesweeper.Solver;
+using DalamudMinesweeper.Sweepers;
 using DalamudMinesweeper.Sprites;
 using ImGuiNET;
 
@@ -15,7 +15,7 @@ public class MainWindow : Window, IDisposable
     private readonly NumberSprites _numberSprites;
 
     private readonly Configuration _configuration;
-    private readonly StepSolver _solver;
+    private readonly SimpleSweeperStep _solver;
     private MinesweeperGame _game;
     private Vector2 _boardDimensions;
     private bool _canSaveScore; // latching to solve debounce
@@ -54,7 +54,7 @@ public class MainWindow : Window, IDisposable
 
         _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _tileSprites, _configuration);
-        _solver = new StepSolver(_game);
+        _solver = new SimpleSweeperStep(_game);
         _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
         _footer = new Footer(_configuration, plugin.DrawConfigUI, plugin.DrawScoresUI, _solver.Step);
         _background = new Background(_game, _configuration, _borderWidthPx);

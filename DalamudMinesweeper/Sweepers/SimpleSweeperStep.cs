@@ -1,13 +1,12 @@
 using DalamudMinesweeper.Game;
 
-namespace DalamudMinesweeper.Solver;
+namespace DalamudMinesweeper.Sweepers;
 
-public class StepSolver(MinesweeperGame game)
+public class SimpleSweeperStep(MinesweeperGame game) : SweeperStep(game)
 {
-    public MinesweeperGame Game { get; set; } = game;
     private Board _board => Game.Board;
 
-    public void Step()
+    public override void Step()
     {
         PlaceObviousFlags();
         ClickAllRevealedNumbers();

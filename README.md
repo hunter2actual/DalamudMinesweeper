@@ -21,3 +21,4 @@ How to play
 - https://web.mat.bham.ac.uk/R.W.Kaye/minesw/minesw.pdf
 - https://web.mat.bham.ac.uk/R.W.Kaye/minesw/ASE2003.pdf
 - https://massaioli.wordpress.com/2013/01/12/solving-minesweeper-with-matricies/
+- https://luckytoilet.wordpress.com/2012/12/23/2125/

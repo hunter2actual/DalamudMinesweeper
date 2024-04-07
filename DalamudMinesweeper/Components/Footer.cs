@@ -2,23 +2,28 @@ using System;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Interface.Components;
+using DalamudMinesweeper.Game;
+using DalamudMinesweeper.Sweepers;
 using ImGuiNET;
 
 namespace DalamudMinesweeper.Components;
 
 public class Footer
 {
+    public MinesweeperGame Game { get; set; }
     private Configuration _configuration;
     private Action _drawConfigAction;
     private Action _drawScoresAction;
-    private Action _solverStepAction;
+    private readonly Sweeper _sweeper;
+    private bool? _swept;
 
-    public Footer(Configuration configuration, Action drawConfigAction, Action drawScoresAction, Action solverStepAction)
+    public Footer(MinesweeperGame game, Configuration configuration, Action drawConfigAction, Action drawScoresAction, Sweeper sweeper)
     {
+        Game = game;
         _configuration = configuration;
         _drawConfigAction = drawConfigAction;
         _drawScoresAction = drawScoresAction;
-        _solverStepAction = solverStepAction;
+        _sweeper = sweeper;
     }
 
     public void Draw(Vector2 start)
@@ -48,9 +53,14 @@ public class Footer
 
         if (_configuration.DevMode)
         {
-            if (ImGui.Button("Solver Step"))
+            if (ImGui.Button("Sweep"))
             {
-                _solverStepAction();
+                _swept = _sweeper.Solve(Game);
+            }
+            ImGui.SameLine();
+            if (_swept is not null)
+            {
+               ImGui.Text($"{(_swept.Value ? "Swept" : "Stalled" )} after {_sweeper.NumSteps} steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
             }
         }
     }

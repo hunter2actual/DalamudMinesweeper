@@ -2,44 +2,50 @@ using DalamudMinesweeper.Game;
 
 namespace DalamudMinesweeper.Sweepers;
 
-public class SimpleSweeperStep(MinesweeperGame game) : SweeperStep(game)
+public static class SimpleSweeperStep
 {
-    private Board _board => Game.Board;
-
-    public override void Step()
+    /*
+     * 1) If a number n has n adjacent hidden tiles, they must all be mines, so flag them
+     * 2) If a number n has n adjacent flags, every other adjace must be safe, so click them
+     *    We leverage the Game.Click() logic for 2)
+     */
+    public static bool Step(MinesweeperGame game)
     {
-        PlaceObviousFlags();
-        ClickAllRevealedNumbers();
+        var preState = SweeperGameState.From(game);
+        PlaceObviousFlags(game);
+        ClickAllRevealedNumbers(game);
+        var postState = SweeperGameState.From(game);
+        return preState == postState;
     }
 
-    private void PlaceObviousFlags()
+    private static void PlaceObviousFlags(MinesweeperGame game)
     {
-        for (int x = 0; x < _board.width; x++) {
-            for (int y = 0; y < _board.height; y++) {
-                var cell = _board.cells[x, y];
-                if (IsRevealedNumber(cell) && NumNeighbouringHiddenPanels(x, y) == cell.numNeighbouringMines)
+        for (int x = 0; x < game.Board.width; x++) {
+            for (int y = 0; y < game.Board.height; y++) {
+                var cell = game.Board.cells[x, y];
+                if (IsRevealedNumber(cell) && NumNeighbouringHiddenPanels(game, x, y) == cell.numNeighbouringMines)
                 {
-                    FlagAdjacent(x, y);
+                    FlagAdjacent(game, x, y);
                 }
             }
         }
     }
 
-    private void ClickAllRevealedNumbers()
+    private static void ClickAllRevealedNumbers(MinesweeperGame game)
     {
-        for (int x = 0; x < _board.width; x++) {
-            for (int y = 0; y < _board.height; y++) {
-                var cell = _board.cells[x, y];
+        for (int x = 0; x < game.Board.width; x++) {
+            for (int y = 0; y < game.Board.height; y++) {
+                var cell = game.Board.cells[x, y];
                 if (IsRevealedNumber(cell))
-                    Game.Click(x, y);
+                    game.Click(x, y);
             }
         }
     }
 
-    private bool IsRevealedNumber(Cell cell)
+    private static bool IsRevealedNumber(Cell cell)
         => cell is { isRevealed: true, isFlagged: false, contents: CellContents.Number};
     
-    private int NumNeighbouringHiddenPanels(int x, int y)
+    private static int NumNeighbouringHiddenPanels(MinesweeperGame game, int x, int y)
     {
         int count = 0;
 
@@ -51,10 +57,10 @@ public class SimpleSweeperStep(MinesweeperGame game) : SweeperStep(game)
                     continue;
                 
                 // Avoid out of bounds
-                if (x2 < 0 || y2 < 0 || x2 >= _board.width || y2 >= _board.height)
+                if (x2 < 0 || y2 < 0 || x2 >= game.Board.width || y2 >= game.Board.height)
                     continue;
                 
-                if (!_board.cells[x2, y2].isRevealed)
+                if (!game.Board.cells[x2, y2].isRevealed)
                     count++;
             }
         }
@@ -62,7 +68,7 @@ public class SimpleSweeperStep(MinesweeperGame game) : SweeperStep(game)
         return count;
     }
 
-    private void FlagAdjacent(int x, int y)
+    private static void FlagAdjacent(MinesweeperGame game, int x, int y)
     {
         // Loop through a square around the current cell
         for (int x2 = x-1; x2 <= x+1; x2++) {
@@ -72,12 +78,12 @@ public class SimpleSweeperStep(MinesweeperGame game) : SweeperStep(game)
                     continue;
                 
                 // Avoid out of bounds
-                if (x2 < 0 || y2 < 0 || x2 >= _board.width || y2 >= _board.height)
+                if (x2 < 0 || y2 < 0 || x2 >= game.Board.width || y2 >= game.Board.height)
                     continue;
                 
-                var cell = _board.cells[x2, y2];
+                var cell = game.Board.cells[x2, y2];
                 if (cell is {isRevealed: false, isFlagged: false})
-                    Game.RightClick(x2, y2);
+                    game.RightClick(x2, y2);
             }
         }
     }

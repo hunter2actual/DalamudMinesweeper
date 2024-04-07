@@ -13,9 +13,9 @@ public class MainWindow : Window, IDisposable
 {
     private readonly TileSprites _tileSprites;
     private readonly NumberSprites _numberSprites;
+    private readonly Sweeper _sweeper;
 
     private readonly Configuration _configuration;
-    private readonly SimpleSweeperStep _solver;
     private MinesweeperGame _game;
     private Vector2 _boardDimensions;
     private bool _canSaveScore; // latching to solve debounce
@@ -52,11 +52,11 @@ public class MainWindow : Window, IDisposable
         _numberSprites = new NumberSprites(plugin.PluginInterface);
         _gridSquareSizePxVec2 = new Vector2(0, 0);
 
+        _sweeper = new Sweeper();
         _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _tileSprites, _configuration);
-        _solver = new SimpleSweeperStep(_game);
         _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
-        _footer = new Footer(_configuration, plugin.DrawConfigUI, plugin.DrawScoresUI, _solver.Step);
+        _footer = new Footer(_game, _configuration, plugin.DrawConfigUI, plugin.DrawScoresUI, _sweeper);
         _background = new Background(_game, _configuration, _borderWidthPx);
     }
 
@@ -128,9 +128,9 @@ public class MainWindow : Window, IDisposable
         {
             _background.Game = _game;
         }
-        if (_solver is not null)
+        if (_footer is not null) 
         {
-            _solver.Game = _game;
+            _footer.Game = _game;
         }
 
         _canSaveScore = true;

@@ -11,12 +11,14 @@ public class Footer
     private Configuration _configuration;
     private Action _drawConfigAction;
     private Action _drawScoresAction;
+    private Action _solverStepAction;
 
-    public Footer(Configuration configuration, Action drawConfigAction, Action drawScoresAction)
+    public Footer(Configuration configuration, Action drawConfigAction, Action drawScoresAction, Action solverStepAction)
     {
         _configuration = configuration;
         _drawConfigAction = drawConfigAction;
         _drawScoresAction = drawScoresAction;
+        _solverStepAction = solverStepAction;
     }
 
     public void Draw(Vector2 start)
@@ -41,7 +43,15 @@ public class Footer
         if (ImGuiComponents.IconButton(FontAwesomeIcon.Minus) && _configuration.Zoom > 1)
         {
             _configuration.Zoom--;
-        };
+        }
         ImGui.SameLine();
+
+        if (_configuration.DevMode)
+        {
+            if (ImGui.Button("Solver Step"))
+            {
+                _solverStepAction();
+            }
+        }
     }
 }

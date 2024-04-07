@@ -31,7 +31,6 @@ public class BoardBuilder {
 
         board = PopulateCells(board);
         board = PlaceMines(board);
-        board = SetLocations(board);
         board = SetNeighbouringMines(board);
         return board;
     }
@@ -82,34 +81,6 @@ public class BoardBuilder {
     }
 
     record point2(int x, int y);
-
-    private Board SetLocations(Board board)
-    {
-        Cell currentCell;
-        point2 currentPos;
-        for (int x = 0; x < board.width; x++) {
-            for (int y = 0; y < board.height; y++) {
-                currentCell = board.cells[x, y];
-                currentPos = new point2(x, y);
-
-                // Ugly but switch didn't work without constants
-                if (currentPos is {x:0, y:0} 
-                    || (currentPos.y == board.height && currentPos.x == board.width))
-                {
-                    currentCell.location = CellLocation.Corner;
-                }
-                else if (currentPos is {x:0} || currentPos is {y:0}
-                    || currentPos.y == board.height || currentPos.x == board.width)
-                {
-                    currentCell.location = CellLocation.Edge;
-                }
-                else {
-                    currentCell.location = CellLocation.Middle;
-                }
-            }
-        }
-        return board;
-    }
 
     private Board SetNeighbouringMines(Board board)
     {

@@ -14,8 +14,7 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(350, 220);
-        SizeCondition = ImGuiCond.Always;
+        Size = new Vector2(350, 240);
 
         _configuration = plugin.Configuration;
     }
@@ -47,7 +46,7 @@ public class ConfigWindow : Window, IDisposable
         var width = _configuration.BoardWidth;
         if (ImGui.InputInt("Board width", ref width))
         {
-            if (width <= 4) width = 4;
+            if (width < 5) width = 5;
             if (width > 99) width = 99;
             _configuration.BoardWidth = width;            
         }
@@ -55,7 +54,7 @@ public class ConfigWindow : Window, IDisposable
         var height = _configuration.BoardHeight;
         if (ImGui.InputInt("Board height", ref height))
         {
-            if (height <= 4) height = 4;
+            if (height < 5) height = 5;
             if (height > 99) height = 99;
             _configuration.BoardHeight = height;            
         }
@@ -68,12 +67,20 @@ public class ConfigWindow : Window, IDisposable
             _configuration.NumMines = numMines;   
         }
 
-        if (ImGui.Button("Reset zoom level")) {
+        if (ImGui.Button("Reset zoom level"))
+        {
             _configuration.Zoom = 2;
         }
 
-        if (ImGui.Button("Clear scores")) {
+        if (ImGui.Button("Clear scores"))
+        {
             _configuration.Scores = new Game.Scores([]);
+        }
+
+        var devMode = _configuration.DevMode;
+        if (ImGui.Checkbox("Dev mode", ref devMode))
+        {
+            _configuration.DevMode = devMode;
         }
 
         if (ImGui.Button("Save and Close")) {

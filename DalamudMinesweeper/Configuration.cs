@@ -14,6 +14,7 @@ public class Configuration : IPluginConfiguration
     public int BoardHeight { get; set; } = 16;
     public int NumMines { get; set; } = 40;
     public int Zoom { get; set; } = 2;
+    public bool DevMode { get; set; } = false;
 
     public Scores Scores { get; set; } = new Scores([]);
 

@@ -15,3 +15,9 @@ How to play
 - Active click logic (tile depression and shocked smiley)
 - Implement solver and noguess mode
 - [Stretch] Skins
+
+### Sweeper things
+- https://quantum-p.livejournal.com/19616.html
+- https://web.mat.bham.ac.uk/R.W.Kaye/minesw/minesw.pdf
+- https://web.mat.bham.ac.uk/R.W.Kaye/minesw/ASE2003.pdf
+- https://massaioli.wordpress.com/2013/01/12/solving-minesweeper-with-matricies/

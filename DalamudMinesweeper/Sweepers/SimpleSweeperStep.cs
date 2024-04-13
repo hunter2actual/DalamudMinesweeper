@@ -20,8 +20,8 @@ public static class SimpleSweeperStep
 
     private static void PlaceObviousFlags(MinesweeperGame game)
     {
-        for (int x = 0; x < game.Board.width; x++) {
-            for (int y = 0; y < game.Board.height; y++) {
+        for (int x = 0; x < game.Width; x++) {
+            for (int y = 0; y < game.Height; y++) {
                 var cell = game.Board.cells[x, y];
                 if (IsRevealedNumber(cell) && NumNeighbouringHiddenPanels(game, x, y) == cell.numNeighbouringMines)
                 {
@@ -33,8 +33,8 @@ public static class SimpleSweeperStep
 
     private static void ClickAllRevealedNumbers(MinesweeperGame game)
     {
-        for (int x = 0; x < game.Board.width; x++) {
-            for (int y = 0; y < game.Board.height; y++) {
+        for (int x = 0; x < game.Width; x++) {
+            for (int y = 0; y < game.Height; y++) {
                 var cell = game.Board.cells[x, y];
                 if (IsRevealedNumber(cell))
                     game.Click(x, y);
@@ -57,7 +57,7 @@ public static class SimpleSweeperStep
                     continue;
                 
                 // Avoid out of bounds
-                if (x2 < 0 || y2 < 0 || x2 >= game.Board.width || y2 >= game.Board.height)
+                if (x2 < 0 || y2 < 0 || x2 >= game.Width || y2 >= game.Height)
                     continue;
                 
                 if (!game.Board.cells[x2, y2].isRevealed)
@@ -78,7 +78,7 @@ public static class SimpleSweeperStep
                     continue;
                 
                 // Avoid out of bounds
-                if (x2 < 0 || y2 < 0 || x2 >= game.Board.width || y2 >= game.Board.height)
+                if (x2 < 0 || y2 < 0 || x2 >= game.Width || y2 >= game.Height)
                     continue;
                 
                 var cell = game.Board.cells[x2, y2];

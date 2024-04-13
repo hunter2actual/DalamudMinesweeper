@@ -8,8 +8,8 @@ public record SweeperGameState(int NumHiddenPanels, int NumFlags, GameState Game
     {
         int hidden = 0, flags = 0;
 
-        for (int x = 0; x < game.Board.width; x++) {
-            for (int y = 0; y < game.Board.height; y++) {
+        for (int x = 0; x < game.Width; x++) {
+            for (int y = 0; y < game.Height; y++) {
                 var cell = game.Board.cells[x, y];
                 if (cell.isFlagged)
                 {

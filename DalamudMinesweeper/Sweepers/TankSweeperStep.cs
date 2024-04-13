@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using DalamudMinesweeper.Game;
@@ -10,6 +11,8 @@ public class TankSweeperStep
     private record LocatedCell(Cell Cell, int X, int Y);
     private record TankCell(int X, int Y, int NumRemainingFlags, TankCellType CellType);
     private enum TankCellType { BorderNumber, BorderHidden }
+    private record Point(int X, int Y);
+    private record HypotheticalCell(int X, int Y, bool IsFlagged, int NumRemainingFlags);
 
     /*
      * Considering groups of "border" tiles (hidden tiles adjacent to a number),
@@ -19,23 +22,121 @@ public class TankSweeperStep
      */
     public static bool Step(MinesweeperGame game)
     {
-        var tankCells = GetTankCells(game);
+        // var tankCells = GetTankCells(game);
         var numPlacedFlags = GetNumFlags(game);
         var numRemainingMines = game.NumUnflaggedMines();
-        if (tankCells.Count == 0)
-            return false;
+        // if (tankCells.Count == 0)
+        //     return false;
 
-        var flagCombinations = FlagCombinations(tankCells.Count(tc => tc.CellType is TankCellType.BorderHidden))
-            .Where(fc => fc.Count(x => x is true) <= numRemainingMines) // can't place more flags than we have remaining mines
-            .ToList();
+        // var flagCombinations = FlagCombinations(tankCells.Count(tc => tc.CellType is TankCellType.BorderHidden))
+        //     .Where(fc => fc.Count(x => x is true) <= numRemainingMines) // can't place more flags than we have remaining mines
+        //     .ToList();
 
         
         // probably easier to say screw the data types, just calculate by iterating through if (x,y) 
         // is a borderNumber or BorderHidden and save those coords to two lists
         // then place hypothetical flags and evaluate game state
 
+        var (numbersBorderingHiddens, hiddensBorderingNumbers) = FindRelevantCells(game);
+        var flagCombinations = FlagCombinations(hiddensBorderingNumbers.Count);
+
+        var hypotheticals = CreateHypotheticals(game, numbersBorderingHiddens, hiddensBorderingNumbers, flagCombinations);
+
 
         return false;
+    }
+
+    // Returns a list of hypothetical boards in which only the relevant border cells are not null/default
+    private static List<HypotheticalCell[,]> CreateHypotheticals(MinesweeperGame game, List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers, List<bool[]> flagCombinations)
+    {
+        if (flagCombinations.First().Length != hiddensBorderingNumbers.Count)
+            throw new Exception("Tank step permutation mismatch");
+
+        List<HypotheticalCell[,]> allHypotheticalBoards = [];
+
+        HypotheticalCell[,] baseHypotheticalBoard = new HypotheticalCell[game.Width, game.Height];
+        foreach (var nbh in numbersBorderingHiddens)
+        {
+            baseHypotheticalBoard[nbh.point.X, nbh.point.Y] = new HypotheticalCell(nbh.point.X, nbh.point.Y, false, nbh.numRemainingFlags);
+        }
+
+        foreach (var fc in flagCombinations)
+        {
+            HypotheticalCell[,] currentHypotheticalBoard = (HypotheticalCell[,]) baseHypotheticalBoard.Clone();
+            for (int i = 0; i < hiddensBorderingNumbers.Count; i++)
+            {
+                var hbn = hiddensBorderingNumbers[i];
+                currentHypotheticalBoard[hbn.X, hbn.Y] = new HypotheticalCell(hbn.X, hbn.Y, fc[i], 0);
+            }
+            allHypotheticalBoards.Add(currentHypotheticalBoard);
+        }
+
+        return allHypotheticalBoards;
+    }
+
+    private static (List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers) FindRelevantCells(MinesweeperGame game)
+    {
+        Cell currentCell;
+        Cell neighbourCell;
+        Point currentPoint;
+        bool neighbourIsHidden;
+        bool neighbourIsNumber;
+        int numNeighbouringFlags;
+        List<(Point point, int numRemainingFlags)> numbersBorderingHiddens = [];
+        List<Point> hiddensBorderingNumbers = [];
+
+        for (int x = 0; x < game.Width; x++)
+        {
+            for (int y = 0; y < game.Height; y++)
+            {
+                currentCell = game.GetCell(x, y);
+                currentPoint = new Point(x, y);
+                neighbourIsHidden = false;
+                neighbourIsNumber = false;
+                numNeighbouringFlags = 0;
+
+                // Loop through a square around the current cell
+                for (int x2 = x-1; x2 <= x+1; x2++) {
+                    for (int y2 = y-1; y2 <= y+1; y2++) {
+                        // Skip self
+                        if (x2 == x && y2 == y)
+                            continue;
+                        
+                        // Avoid out of bounds
+                        if (x2 < 0 || y2 < 0 || x2 >= game.Width || y2 >= game.Height)
+                            continue;
+                        
+                        neighbourCell = game.GetCell(x2, y2);
+
+                        if (neighbourCell.isFlagged)
+                        {
+                            numNeighbouringFlags++;
+                        }
+
+                        if (!neighbourCell.isRevealed)
+                        {
+                            neighbourIsHidden = true;
+                        }
+                        else if (neighbourCell.contents is CellContents.Number)
+                        {
+                            neighbourIsNumber = true;
+                        }
+                    }
+                }
+
+                if (neighbourIsHidden && currentCell is { isRevealed: true, contents: CellContents.Number })
+                {
+                    var numRemainingFlags = currentCell.numNeighbouringMines - numNeighbouringFlags;
+                    numbersBorderingHiddens.Add((currentPoint, numRemainingFlags));
+                }
+                else if (neighbourIsNumber && !currentCell.isRevealed)
+                {
+                    hiddensBorderingNumbers.Add(currentPoint);
+                }
+            }
+        }
+
+        return (numbersBorderingHiddens, hiddensBorderingNumbers);
     }
 
     /*
@@ -50,68 +151,11 @@ public class TankSweeperStep
      * check if anything in common between the permutations
      */
 
-    // Manipulation into a preferred data structure.
-    // Only returns numbers bordering hidden cells, and hidden cells bordering numbers
-    private static List<TankCell> GetTankCells(MinesweeperGame game)
-    {
-        var cells = new List<(LocatedCell lc, List<LocatedCell> neighbours, int x, int y)>();
-        for (int x = 0; x < game.Board.width; x++) {
-            for (int y = 0; y < game.Board.height; y++) {
-                var cell = new LocatedCell(game.Board.cells[x, y], x, y);
-                var neighbours = new List<LocatedCell>();
-                for (int x2 = x-1; x2 <= x+1; x2++) {
-                    for (int y2 = y-1; y2 <= y+1; y2++) {
-                        // Skip self
-                        if (x2 == x && y2 == y)
-                            continue;
-                        
-                        // Avoid out of bounds
-                        if (x2 < 0 || y2 < 0 || x2 >= game.Board.width || y2 >= game.Board.height)
-                            continue;
-
-                        neighbours.Add(new LocatedCell(game.GetCell(x2, y2), x2, y2));
-                    }
-                }
-                cells.Add((cell, neighbours, x, y));
-            }
-        }
-
-        var nonFlaggedHiddenBorderCells = cells
-            .Where(x => x.lc.Cell.contents is CellContents.Number)
-            .SelectMany(x => x.neighbours)
-            .Where(n => n is {Cell.isRevealed: false, Cell.isFlagged: false})
-            .ToHashSet();
-
-        var borderNumberCells = cells
-            .Where(x => x.lc.Cell is {isRevealed: true, contents: CellContents.Number})
-            .Where(x => x.neighbours.Any(n => n is {Cell.isRevealed: false, Cell.isFlagged: false}))
-            .Select(x => (locatedCell: x.lc, numNeighbouringFlags: x.neighbours.Count(n => n is {Cell.isFlagged: true})))
-            .ToHashSet();
-
-        var tankCells = new List<TankCell>();
-
-        tankCells.AddRange(nonFlaggedHiddenBorderCells.Select(lc => new TankCell(
-            lc.X,
-            lc.Y,
-            0,
-            TankCellType.BorderHidden
-        )));
-
-        tankCells.AddRange(borderNumberCells.Select(b => new TankCell(
-            b.locatedCell.X,
-            b.locatedCell.Y,
-            b.locatedCell.Cell.numNeighbouringMines - b.numNeighbouringFlags,
-            TankCellType.BorderNumber
-        )));
-
-        return tankCells;
-    }
-
     private static int GetNumFlags(MinesweeperGame game)
     {
         var numFlags = 0;
-        for (int x = 0; x < game.Board.width; x++) {
-            for (int y = 0; y < game.Board.height; y++) {
+        for (int x = 0; x < game.Width; x++) {
+            for (int y = 0; y < game.Height; y++) {
                 if (game.GetCell(x, y).isFlagged) numFlags++;
             }
         }
@@ -132,25 +176,5 @@ public class TankSweeperStep
             result.Add(combination);
         }
         return result;
-    }
-
-    private static bool IsBorderCell(int x, int y, MinesweeperGame game)
-    {
-        for (int x2 = x-1; x2 <= x+1; x2++) {
-            for (int y2 = y-1; y2 <= y+1; y2++) {
-                // Skip self
-                if (x2 == x && y2 == y)
-                    continue;
-                
-                // Avoid out of bounds
-                if (x2 < 0 || y2 < 0 || x2 >= game.Board.width || y2 >= game.Board.height)
-                    continue;
-
-                var cell = game.GetCell(x2, y2);
-                if (cell.contents is CellContents.Number && cell.isRevealed)
-                    return true;
-            }
-        }
-        return false;
     }
 }

@@ -35,6 +35,42 @@ public class BoardBuilder {
         return board;
     }
 
+    // It's a test helper, pray forgive me
+    public static Board FromStrings(string[] boardStrings)
+    {
+        var width = boardStrings[0].Length;
+        var height = boardStrings.Length;
+        var board = new Board
+        {
+            width = width,
+            height = height,
+            cells = new Cell[width, height]
+        };
+
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < width; y++)
+            {
+                var inputChar = boardStrings[y][x];
+
+                board.cells[x, y] = new Cell
+                {
+                    isRevealed = false,
+                    contents = inputChar switch
+                    {
+                        '*' => CellContents.Mine,
+                        ' ' => CellContents.Clear,
+                        _ => CellContents.Number
+                    }
+                };
+            }
+        }
+
+        board = SetNeighbouringMines(board);
+
+        return board;
+    }
+
     public BoardBuilder WithClearPosition(int x, int y)
     {
         _xStart = x;
@@ -82,7 +118,7 @@ public class BoardBuilder {
 
     record point2(int x, int y);
 
-    private Board SetNeighbouringMines(Board board)
+    private static Board SetNeighbouringMines(Board board)
     {
         Cell currentCell;
         for (int x = 0; x < board.width; x++) {

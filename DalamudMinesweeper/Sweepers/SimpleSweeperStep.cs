@@ -15,7 +15,7 @@ public static class SimpleSweeperStep
         PlaceObviousFlags(game);
         ClickAllRevealedNumbers(game);
         var postState = SweeperGameState.From(game);
-        return preState == postState;
+        return preState != postState;
     }
 
     private static void PlaceObviousFlags(MinesweeperGame game)

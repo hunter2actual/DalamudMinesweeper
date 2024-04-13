@@ -53,9 +53,14 @@ public class Footer
 
         if (_configuration.DevMode)
         {
-            if (ImGui.Button("Sweep"))
+            if (ImGui.Button("Simple"))
             {
-                _swept = _sweeper.Solve(Game);
+                _swept = _sweeper.SimpleSweep(Game);
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Tank"))
+            {
+                _swept = _sweeper.TankSweep(Game);
             }
             ImGui.SameLine();
             if (_swept is not null)

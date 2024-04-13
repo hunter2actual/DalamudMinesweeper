@@ -24,6 +24,7 @@ public class Sweeper
         {
             NumSteps++;
         }
+        Stopwatch.Stop();
         return game.GameState == GameState.Victorious;
     }
 }

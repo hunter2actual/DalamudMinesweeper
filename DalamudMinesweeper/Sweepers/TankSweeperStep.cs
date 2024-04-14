@@ -5,14 +5,17 @@ using DalamudMinesweeper.Game;
 
 namespace DalamudMinesweeper.Sweepers;
 
+// TODOs:
+// Click anything that's guaranteed non-flag on border
+// Segregate
 
 public class TankSweeperStep
 {
-    private record LocatedCell(Cell Cell, int X, int Y);
-    private record TankCell(int X, int Y, int NumRemainingFlags, TankCellType CellType);
-    private enum TankCellType { BorderNumber, BorderHidden }
-    private record Point(int X, int Y);
-    private record HypotheticalCell(int X, int Y, bool IsFlagged, int NumRemainingFlags);
+    public record LocatedCell(Cell Cell, int X, int Y);
+    public record TankCell(int X, int Y, int NumRemainingFlags, TankCellType CellType);
+    public enum TankCellType { BorderNumber, BorderHidden }
+    public record Point(int X, int Y);
+    public record HypotheticalCell(int X, int Y, bool IsFlagged, bool isHidden, int NumRemainingFlags);
 
     /*
      * Considering groups of "border" tiles (hidden tiles adjacent to a number),
@@ -31,7 +34,7 @@ public class TankSweeperStep
             return false;
 
         var flagCombinations = FlagCombinations(hiddensBorderingNumbers.Count)
-            .Where(fc => fc.Count(x => x is true) <= numRemainingMines) // can't place more flags than we have remaining mines
+            .Where(fc => fc.Count(x => x is true) <= numRemainingMines || !fc.Any(x => x is true)) // can't place more flags than we have remaining mines
             .ToList();
 
         if (flagCombinations.Count == 0)
@@ -56,7 +59,7 @@ public class TankSweeperStep
         return preState != postState;
     }
 
-    private static int GetNumFlags(MinesweeperGame game)
+    public static int GetNumFlags(MinesweeperGame game)
     {
         var numFlags = 0;
         for (int x = 0; x < game.Width; x++) {
@@ -67,7 +70,7 @@ public class TankSweeperStep
         return numFlags;
     }
 
-    private static (List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers) FindRelevantCells(MinesweeperGame game)
+    public static (List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers) FindRelevantCells(MinesweeperGame game)
     {
         Cell currentCell;
         Cell neighbourCell;
@@ -133,7 +136,7 @@ public class TankSweeperStep
     }
 
     // https://stackoverflow.com/questions/12488876/all-possible-combinations-of-boolean-variables
-    private static List<bool[]> FlagCombinations(int numHiddenTiles)
+    public static List<bool[]> FlagCombinations(int numHiddenTiles)
     {
         var result = new List<bool[]>();
 
@@ -148,7 +151,7 @@ public class TankSweeperStep
     }
 
     // Returns a list of hypothetical boards in which only the relevant border cells are not null/default
-    private static List<HypotheticalCell[,]> CreateHypotheticals(MinesweeperGame game, List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers, List<bool[]> flagCombinations)
+    public static List<HypotheticalCell[,]> CreateHypotheticals(MinesweeperGame game, List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers, List<bool[]> flagCombinations)
     {
         if (flagCombinations.First().Length != hiddensBorderingNumbers.Count)
             throw new Exception("Tank step permutation mismatch");
@@ -158,7 +161,7 @@ public class TankSweeperStep
         HypotheticalCell[,] baseHypotheticalBoard = new HypotheticalCell[game.Width, game.Height];
         foreach (var nbh in numbersBorderingHiddens)
         {
-            baseHypotheticalBoard[nbh.point.X, nbh.point.Y] = new HypotheticalCell(nbh.point.X, nbh.point.Y, false, nbh.numRemainingFlags);
+            baseHypotheticalBoard[nbh.point.X, nbh.point.Y] = new HypotheticalCell(nbh.point.X, nbh.point.Y, false, false, nbh.numRemainingFlags);
         }
 
         foreach (var fc in flagCombinations)
@@ -167,7 +170,7 @@ public class TankSweeperStep
             for (int i = 0; i < hiddensBorderingNumbers.Count; i++)
             {
                 var hbn = hiddensBorderingNumbers[i];
-                currentHypotheticalBoard[hbn.X, hbn.Y] = new HypotheticalCell(hbn.X, hbn.Y, fc[i], 0);
+                currentHypotheticalBoard[hbn.X, hbn.Y] = new HypotheticalCell(hbn.X, hbn.Y, fc[i], true, 0);
             }
             allHypotheticalBoards.Add(currentHypotheticalBoard);
         }
@@ -175,13 +178,13 @@ public class TankSweeperStep
         return allHypotheticalBoards;
     }
 
-    private static bool IsValidHypothetical(MinesweeperGame game, HypotheticalCell[,] hypotheticalBoard)
+    public static bool IsValidHypothetical(MinesweeperGame game, HypotheticalCell[,] hypotheticalBoard)
     {
         for (int x = 0; x < game.Width; x++)
         {
             for (int y = 0; y < game.Height; y++)
             {
-                if (hypotheticalBoard[x,y] is null)
+                if (hypotheticalBoard[x,y] is null || hypotheticalBoard[x, y].isHidden)
                     continue;
 
                 var numRemainingFlags = hypotheticalBoard[x,y].NumRemainingFlags;
@@ -211,7 +214,7 @@ public class TankSweeperStep
         return true;
     }
 
-    private static bool[,] CondenseHypotheticals(MinesweeperGame game, List<HypotheticalCell[,]> boards)
+    public static bool[,] CondenseHypotheticals(MinesweeperGame game, List<HypotheticalCell[,]> boards)
     {
         bool[,] result = new bool[game.Width, game.Height];
         for (int x = 0; x < game.Width; x++) {
@@ -224,14 +227,14 @@ public class TankSweeperStep
         {
             for (int x = 0; x < game.Width; x++) {
                 for (int y = 0; y < game.Height; y++) {
-                    result[x,y] = result[x,y] && board[x,y].IsFlagged;
+                    result[x,y] = result[x,y] && (board[x,y]?.IsFlagged ?? false);
                 }
             } 
         }
         return result;
     }
 
-    private static void PlaceFlags(MinesweeperGame game, bool[,] confirmedFlags)
+    public static void PlaceFlags(MinesweeperGame game, bool[,] confirmedFlags)
     {
         for (int x = 0; x < game.Width; x++) {
             for (int y = 0; y < game.Height; y++) {

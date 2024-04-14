@@ -14,6 +14,7 @@ How to play
 ### Todos
 - Active click logic (tile depression and shocked smiley)
 - Implement solver and noguess mode
+- Refactoring, optimisation, clean up naming (cell/panel/tile etc)
 - [Stretch] Skins
 
 ### Sweeper things

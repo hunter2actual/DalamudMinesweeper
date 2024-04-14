@@ -12,10 +12,9 @@ namespace DalamudMinesweeper.Sweepers;
 public class TankSweeperStep
 {
     public record LocatedCell(Cell Cell, int X, int Y);
-    public record TankCell(int X, int Y, int NumRemainingFlags, TankCellType CellType);
-    public enum TankCellType { BorderNumber, BorderHidden }
     public record Point(int X, int Y);
-    public record HypotheticalCell(int X, int Y, bool IsFlagged, bool isHidden, int NumRemainingFlags);
+    public record HypotheticalCell(int X, int Y, HypotheticalCellContents contents, int NumRemainingFlags);
+    public enum HypotheticalCellContents { Irrelevant, HiddenUnsure, HiddenWithFlag, HiddenWithoutFlag, RevealedNumber }
 
     /*
      * Considering groups of "border" tiles (hidden tiles adjacent to a number),
@@ -50,9 +49,9 @@ public class TankSweeperStep
         if (validHypotheticals.Count == 0)
             return false;
 
-        var confirmedFlags = CondenseHypotheticals(game, validHypotheticals);
+        var confirmedState = CondenseHypotheticals(game, validHypotheticals);
 
-        PlaceFlags(game, confirmedFlags);
+        ActOnState(game, confirmedState);
 
         var postState = SweeperGameState.From(game);
 
@@ -125,7 +124,7 @@ public class TankSweeperStep
                     var numRemainingFlags = currentCell.numNeighbouringMines - numNeighbouringFlags;
                     numbersBorderingHiddens.Add((currentPoint, numRemainingFlags));
                 }
-                else if (neighbourIsNumber && !currentCell.isRevealed)
+                else if (neighbourIsNumber && !currentCell.isRevealed && !currentCell.isFlagged)
                 {
                     hiddensBorderingNumbers.Add(currentPoint);
                 }
@@ -161,7 +160,7 @@ public class TankSweeperStep
         HypotheticalCell[,] baseHypotheticalBoard = new HypotheticalCell[game.Width, game.Height];
         foreach (var nbh in numbersBorderingHiddens)
         {
-            baseHypotheticalBoard[nbh.point.X, nbh.point.Y] = new HypotheticalCell(nbh.point.X, nbh.point.Y, false, false, nbh.numRemainingFlags);
+            baseHypotheticalBoard[nbh.point.X, nbh.point.Y] = new HypotheticalCell(nbh.point.X, nbh.point.Y, HypotheticalCellContents.RevealedNumber, nbh.numRemainingFlags);
         }
 
         foreach (var fc in flagCombinations)
@@ -170,7 +169,8 @@ public class TankSweeperStep
             for (int i = 0; i < hiddensBorderingNumbers.Count; i++)
             {
                 var hbn = hiddensBorderingNumbers[i];
-                currentHypotheticalBoard[hbn.X, hbn.Y] = new HypotheticalCell(hbn.X, hbn.Y, fc[i], true, 0);
+                var contents = fc[i] ? HypotheticalCellContents.HiddenWithFlag : HypotheticalCellContents.HiddenWithoutFlag;
+                currentHypotheticalBoard[hbn.X, hbn.Y] = new HypotheticalCell(hbn.X, hbn.Y, contents, 0);
             }
             allHypotheticalBoards.Add(currentHypotheticalBoard);
         }
@@ -184,7 +184,7 @@ public class TankSweeperStep
         {
             for (int y = 0; y < game.Height; y++)
             {
-                if (hypotheticalBoard[x,y] is null || hypotheticalBoard[x, y].isHidden)
+                if (hypotheticalBoard[x,y] is null || hypotheticalBoard[x, y].contents is not HypotheticalCellContents.RevealedNumber)
                     continue;
 
                 var numRemainingFlags = hypotheticalBoard[x,y].NumRemainingFlags;
@@ -203,7 +203,7 @@ public class TankSweeperStep
                         if (hypotheticalBoard[x2,y2] is null)
                             continue;
 
-                        if (hypotheticalBoard[x2,y2].IsFlagged)
+                        if (hypotheticalBoard[x2,y2].contents is HypotheticalCellContents.HiddenWithFlag)
                             numRemainingFlags--;
                     }
                 }
@@ -214,12 +214,12 @@ public class TankSweeperStep
         return true;
     }
 
-    public static bool[,] CondenseHypotheticals(MinesweeperGame game, List<HypotheticalCell[,]> boards)
+    public static HypotheticalCellContents[,] CondenseHypotheticals(MinesweeperGame game, List<HypotheticalCell[,]> boards)
     {
-        bool[,] result = new bool[game.Width, game.Height];
+        HypotheticalCellContents[,] result = new HypotheticalCellContents[game.Width, game.Height];
         for (int x = 0; x < game.Width; x++) {
             for (int y = 0; y < game.Height; y++) {
-                result[x,y] = true;
+                result[x,y] = HypotheticalCellContents.Irrelevant;
             }
         }
 
@@ -227,20 +227,48 @@ public class TankSweeperStep
         {
             for (int x = 0; x < game.Width; x++) {
                 for (int y = 0; y < game.Height; y++) {
-                    result[x,y] = result[x,y] && (board[x,y]?.IsFlagged ?? false);
+
+                    switch (result[x,y], board[x,y]?.contents)
+                    {
+                        case (HypotheticalCellContents.HiddenUnsure, _):
+                            continue;  // Unsure -> skip
+                        case (HypotheticalCellContents.HiddenWithoutFlag, HypotheticalCellContents.HiddenWithFlag):
+                        case (HypotheticalCellContents.HiddenWithFlag, HypotheticalCellContents.HiddenWithoutFlag):
+                            result[x, y] = HypotheticalCellContents.HiddenUnsure; // Contradiction -> Unsure
+                            break;
+                        case (HypotheticalCellContents.Irrelevant, HypotheticalCellContents.HiddenWithoutFlag):
+                        case (HypotheticalCellContents.HiddenWithoutFlag, HypotheticalCellContents.HiddenWithoutFlag):
+                            result[x, y] = HypotheticalCellContents.HiddenWithoutFlag; // Agreement -> Keep
+                            break;
+                        case (HypotheticalCellContents.Irrelevant, HypotheticalCellContents.HiddenWithFlag):
+                        case (HypotheticalCellContents.HiddenWithFlag, HypotheticalCellContents.HiddenWithFlag):
+                            result[x, y] = HypotheticalCellContents.HiddenWithFlag; // Agreement -> Keep
+                            break;
+                        default:
+                            continue;
+                    }
+
                 }
             } 
         }
         return result;
     }
 
-    public static void PlaceFlags(MinesweeperGame game, bool[,] confirmedFlags)
+    public static void ActOnState(MinesweeperGame game, HypotheticalCellContents[,] confirmedState)
     {
         for (int x = 0; x < game.Width; x++) {
             for (int y = 0; y < game.Height; y++) {
-                if (confirmedFlags[x,y])
+
+                switch (confirmedState[x, y])
                 {
-                    game.RightClick(x, y);
+                    case HypotheticalCellContents.HiddenWithFlag:
+                        game.RightClick(x, y);
+                        break;
+                    case HypotheticalCellContents.HiddenWithoutFlag:
+                        game.Click(x, y);
+                        break;
+                    default:
+                        break;
                 }
             }
         } 

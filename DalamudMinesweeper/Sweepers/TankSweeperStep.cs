@@ -6,15 +6,18 @@ using DalamudMinesweeper.Game;
 namespace DalamudMinesweeper.Sweepers;
 
 // TODOs:
-// Click anything that's guaranteed non-flag on border
 // Segregate
+// Make async
+// Run only once when simple has exhausted itself, and check state before and after entire sweeper run
 
 public class TankSweeperStep
 {
-    public record LocatedCell(Cell Cell, int X, int Y);
-    public record Point(int X, int Y);
-    public record HypotheticalCell(int X, int Y, HypotheticalCellContents contents, int NumRemainingFlags);
-    public enum HypotheticalCellContents { Irrelevant, HiddenUnsure, HiddenWithFlag, HiddenWithoutFlag, RevealedNumber }
+    private record LocatedCell(Cell Cell, int X, int Y);
+    private record Point(int X, int Y);
+    private record HypotheticalCell(int X, int Y, HypotheticalCellContents contents, int NumRemainingFlags);
+    private enum HypotheticalCellContents { Irrelevant, HiddenUnsure, HiddenWithFlag, HiddenWithoutFlag, RevealedNumber }
+
+    private static readonly int HiddenTileLimit = 15; // Exponential time, so this is important
 
     /*
      * Considering groups of "border" tiles (hidden tiles adjacent to a number),
@@ -30,6 +33,9 @@ public class TankSweeperStep
     
         var (numbersBorderingHiddens, hiddensBorderingNumbers) = FindRelevantCells(game);
         if (numbersBorderingHiddens.Count == 0 || hiddensBorderingNumbers.Count == 0)
+            return false;
+
+        if (hiddensBorderingNumbers.Count >= HiddenTileLimit)
             return false;
 
         var flagCombinations = FlagCombinations(hiddensBorderingNumbers.Count)
@@ -58,7 +64,7 @@ public class TankSweeperStep
         return preState != postState;
     }
 
-    public static int GetNumFlags(MinesweeperGame game)
+    private static int GetNumFlags(MinesweeperGame game)
     {
         var numFlags = 0;
         for (int x = 0; x < game.Width; x++) {
@@ -69,7 +75,7 @@ public class TankSweeperStep
         return numFlags;
     }
 
-    public static (List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers) FindRelevantCells(MinesweeperGame game)
+    private static (List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers) FindRelevantCells(MinesweeperGame game)
     {
         Cell currentCell;
         Cell neighbourCell;
@@ -135,7 +141,7 @@ public class TankSweeperStep
     }
 
     // https://stackoverflow.com/questions/12488876/all-possible-combinations-of-boolean-variables
-    public static List<bool[]> FlagCombinations(int numHiddenTiles)
+    private static List<bool[]> FlagCombinations(int numHiddenTiles)
     {
         var result = new List<bool[]>();
 
@@ -150,7 +156,7 @@ public class TankSweeperStep
     }
 
     // Returns a list of hypothetical boards in which only the relevant border cells are not null/default
-    public static List<HypotheticalCell[,]> CreateHypotheticals(MinesweeperGame game, List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers, List<bool[]> flagCombinations)
+    private static List<HypotheticalCell[,]> CreateHypotheticals(MinesweeperGame game, List<(Point point, int numRemainingFlags)> numbersBorderingHiddens, List<Point> hiddensBorderingNumbers, List<bool[]> flagCombinations)
     {
         if (flagCombinations.First().Length != hiddensBorderingNumbers.Count)
             throw new Exception("Tank step permutation mismatch");
@@ -178,7 +184,7 @@ public class TankSweeperStep
         return allHypotheticalBoards;
     }
 
-    public static bool IsValidHypothetical(MinesweeperGame game, HypotheticalCell[,] hypotheticalBoard)
+    private static bool IsValidHypothetical(MinesweeperGame game, HypotheticalCell[,] hypotheticalBoard)
     {
         for (int x = 0; x < game.Width; x++)
         {
@@ -214,7 +220,7 @@ public class TankSweeperStep
         return true;
     }
 
-    public static HypotheticalCellContents[,] CondenseHypotheticals(MinesweeperGame game, List<HypotheticalCell[,]> boards)
+    private static HypotheticalCellContents[,] CondenseHypotheticals(MinesweeperGame game, List<HypotheticalCell[,]> boards)
     {
         HypotheticalCellContents[,] result = new HypotheticalCellContents[game.Width, game.Height];
         for (int x = 0; x < game.Width; x++) {
@@ -254,7 +260,7 @@ public class TankSweeperStep
         return result;
     }
 
-    public static void ActOnState(MinesweeperGame game, HypotheticalCellContents[,] confirmedState)
+    private static void ActOnState(MinesweeperGame game, HypotheticalCellContents[,] confirmedState)
     {
         for (int x = 0; x < game.Width; x++) {
             for (int y = 0; y < game.Height; y++) {

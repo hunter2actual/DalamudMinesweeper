@@ -53,19 +53,14 @@ public class Footer
 
         if (_configuration.DevMode)
         {
-            if (ImGui.Button("Simple"))
+            if (ImGui.Button("Sweep"))
             {
-                _swept = _sweeper.SimpleSweep(Game);
-            }
-            ImGui.SameLine();
-            if (ImGui.Button("Tank"))
-            {
-                _swept = _sweeper.TankSweep(Game);
+                _swept = _sweeper.Sweep(Game);
             }
             ImGui.SameLine();
             if (_swept is not null)
             {
-               ImGui.Text($"{(_swept.Value ? "Swept" : "Stalled" )} after {_sweeper.NumSteps} steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
+               ImGui.Text($"{(_swept.Value ? "Swept" : "Stalled" )} after {_sweeper.NumSimpleSteps} simple steps and {_sweeper.NumTankSteps} tank steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
             }
         }
     }

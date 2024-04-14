@@ -10,20 +10,38 @@ public class Sweeper
     public Sweeper()
     {
         Stopwatch = new Stopwatch();
-        NumSteps = 0;
+        NumSimpleSteps = 0;
+        NumTankSteps = 0;
     }
 
     public Stopwatch Stopwatch { get; init; }
-    public int NumSteps { get; private set; }
+    public int NumSimpleSteps { get; private set; }
+    public int NumTankSteps { get; private set; }
     private readonly TimeSpan Timeout = TimeSpan.FromSeconds(1);
+
+    public bool Sweep(MinesweeperGame game)
+    {
+        Stopwatch.Restart();
+        NumSimpleSteps = NumTankSteps = 0;
+        do
+        {
+            do
+            {
+                NumSimpleSteps++;
+            } while (SimpleSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
+            NumTankSteps++;
+        } while (TankSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
+        Stopwatch.Stop();
+        return game.GameState == GameState.Victorious;
+    }
 
     public bool SimpleSweep(MinesweeperGame game)
     {
         Stopwatch.Restart();
-        NumSteps = 0;
+        NumSimpleSteps = 0;
         do
         {
-            NumSteps++;
+            NumSimpleSteps++;
         } while (SimpleSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
         Stopwatch.Stop();
         return game.GameState == GameState.Victorious;
@@ -32,10 +50,10 @@ public class Sweeper
     public bool TankSweep(MinesweeperGame game)
     {
         Stopwatch.Restart();
-        NumSteps = 0;
+        NumTankSteps = 0;
         do 
         {
-            NumSteps++;
+            NumTankSteps++;
         } while (TankSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
         Stopwatch.Stop();
         return game.GameState == GameState.Victorious;

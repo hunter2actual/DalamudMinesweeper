@@ -6,7 +6,7 @@ public static class TestHelpers
 {
     public static MinesweeperGame InitialiseGame(string[] boardStrings, int initialX, int initialY)
     {
-        var numMines = boardStrings.Select(s => s.Count(c => c == '*')).Sum();
+        var numMines = boardStrings.Sum(s => s.Count(c => c == '*'));
         var game = new MinesweeperGame(boardStrings[0].Length, boardStrings.Length, numMines, () => { });
         game.Click(initialX, initialY);
         game.Board = BoardBuilder.FromStrings(boardStrings);

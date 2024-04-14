@@ -26,6 +26,24 @@ public class TankSweeperStepTests
     }
 
     [Fact]
+    public void WideBoardTest()
+    {
+        var board = new string[]
+        {
+            "     ",
+            "   11",
+            "   1*"
+        };
+
+        var game = TestHelpers.InitialiseGame(board, 0, 0);
+
+        Assert.Equal(GameState.Playing, game.GameState);
+        Assert.True(TankSweeperStep.Step(game)); // first step solves
+        Assert.Equal(GameState.Victorious, game.GameState);
+        Assert.False(SimpleSweeperStep.Step(game)); // second step no effect
+    }
+
+    [Fact]
     public void TwoMineTankTest()
     {
         var board = new string[]
@@ -66,48 +84,72 @@ public class TankSweeperStepTests
     }
 
     [Fact]
-    public void FlagCombinationsTest()
-    {
-        var combinations = TankSweeperStep.FlagCombinations(3);
-
-        Assert.Equal(8, combinations.Count);
-    }
-
-    [Fact]
-    public void NumFlagsTest()
+    public void NonTrivialTankTest()
     {
         var board = new string[]
         {
-            "1*1  ",
-            "111  ",
-            "   11",
-            "   2*",
-            "   2*"
+            "         ",
+            "         ",
+            "         ",
+            " 111     ",
+            " 1*1     ",
+            "1211   11",
+            "*1     2*",
+            " 2     3*",
+            "*1     2*"
         };
 
-        var game = TestHelpers.InitialiseGame(board, 0, 4);
+        var game = TestHelpers.InitialiseGame(board, 0, 0);
 
-        var numFlags = TankSweeperStep.GetNumFlags(game);
-
-        Assert.Equal(0, numFlags);
+        Assert.Equal(GameState.Playing, game.GameState);
+        Assert.True(TankSweeperStep.Step(game)); // first step solves
+        Assert.Equal(GameState.Victorious, game.GameState);
+        Assert.False(SimpleSweeperStep.Step(game)); // second step no effect
     }
 
-    [Fact]
-    public void RelevantCellsTest()
-    {
-        var board = new string[]
-        {
-            "1*1  ",
-            "111  ",
-            "   11",
-            "   2*",
-            "   2*"
-        };
+    //[Fact]
+    //public void FlagCombinationsTest()
+    //{
+    //    var combinations = TankSweeperStep.FlagCombinations(3);
 
-        var game = TestHelpers.InitialiseGame(board, 0, 4);
+    //    Assert.Equal(8, combinations.Count);
+    //}
 
-        var (numbersBorderingHiddens, hiddensBorderingNumbers) = TankSweeperStep.FindRelevantCells(game);
+    //[Fact]
+    //public void NumFlagsTest()
+    //{
+    //    var board = new string[]
+    //    {
+    //        "1*1  ",
+    //        "111  ",
+    //        "   11",
+    //        "   2*",
+    //        "   2*"
+    //    };
 
-        Assert.Equal(4, hiddensBorderingNumbers.Count);
-    }
+    //    var game = TestHelpers.InitialiseGame(board, 0, 4);
+
+    //    var numFlags = TankSweeperStep.GetNumFlags(game);
+
+    //    Assert.Equal(0, numFlags);
+    //}
+
+    //[Fact]
+    //public void RelevantCellsTest()
+    //{
+    //    var board = new string[]
+    //    {
+    //        "1*1  ",
+    //        "111  ",
+    //        "   11",
+    //        "   2*",
+    //        "   2*"
+    //    };
+
+    //    var game = TestHelpers.InitialiseGame(board, 0, 4);
+
+    //    var (numbersBorderingHiddens, hiddensBorderingNumbers) = TankSweeperStep.FindRelevantCells(game);
+
+    //    Assert.Equal(4, hiddensBorderingNumbers.Count);
+    //}
 }

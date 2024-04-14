@@ -49,7 +49,7 @@ public class BoardBuilder {
 
         for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < width; y++)
+            for (int y = 0; y < height; y++)
             {
                 var inputChar = boardStrings[y][x];
 

@@ -21,6 +21,6 @@
     "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/1.0.0.0/latest.zip",
     "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/1.0.0.0/latest.zip",
     "IconUrl": "https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/images/icon.png",
-    "Changelog": "Testing build - progressing towards a noguess mode"
+    "Changelog": "Added no-guess mode"
   }
 ]

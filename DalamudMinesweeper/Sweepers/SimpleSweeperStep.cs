@@ -11,6 +11,9 @@ public static class SimpleSweeperStep
      */
     public static bool Step(MinesweeperGame game)
     {
+        if (game.GameState == GameState.Victorious)
+            return false;
+
         var preState = SweeperGameState.From(game);
         PlaceObviousFlags(game);
         ClickAllRevealedNumbers(game);

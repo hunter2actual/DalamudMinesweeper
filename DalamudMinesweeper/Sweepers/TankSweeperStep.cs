@@ -21,6 +21,9 @@ public class TankSweeperStep
 
     public static Task<bool> StepAsync(MinesweeperGame game, CancellationToken ct)
     {
+        if (game.GameState == GameState.Victorious)
+            return Task.FromResult(false);
+
         var preState = SweeperGameState.From(game);
         var numPlacedFlags = GetNumFlags(game);
         var numRemainingMines = game.NumUnflaggedMines();

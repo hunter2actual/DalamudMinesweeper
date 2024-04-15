@@ -13,11 +13,13 @@ public class Sweeper
         Stopwatch = new Stopwatch();
         NumSimpleSteps = 0;
         NumTankSteps = 0;
+        NumEndgameSteps = 0;
     }
 
     public Stopwatch Stopwatch { get; init; }
     public int NumSimpleSteps { get; private set; }
     public int NumTankSteps { get; private set; }
+    public int NumEndgameSteps { get; private set; }
     public bool Swept { get; private set; }
 
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(2);
@@ -31,12 +33,12 @@ public class Sweeper
             ct = cts.Token;
         }        
         Stopwatch.Restart();
-        NumSimpleSteps = NumTankSteps = 0;
+        NumSimpleSteps = NumTankSteps = NumEndgameSteps = 0;
         Swept = false;
 
         try
         {
-            while(Simple(game) || await TankAsync(game, ct.Value))
+            while(Simple(game) || await TankAsync(game, ct.Value) || Endgame(game))
             {
                 // no-op
             }
@@ -61,5 +63,11 @@ public class Sweeper
     {
         NumTankSteps++;
         return TankSweeperStep.StepAsync(game, ct);
+    }
+
+    private bool Endgame(MinesweeperGame game)
+    {
+        NumEndgameSteps++;
+        return EndgameSweeperStep.Step(game);
     }
 }

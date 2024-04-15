@@ -9,6 +9,7 @@ public class MinesweeperGame
     public int Width { get; init; }
     public int Height { get; init; }
     public int NumMines { get; init; }
+    public bool NoGuessValid { get; private set; }
     private BoardBuilder _boardBuilder;
     private NoGuessGenerator _noGuessGenerator;
     public Board Board;
@@ -18,7 +19,7 @@ public class MinesweeperGame
     private readonly bool _noGuess;
     private Action _onVictory;
 
-    public MinesweeperGame(int width, int height, int numMines, bool noGuess, Action onVictory, int noGuessTimeoutMs = 3000)
+    public MinesweeperGame(int width, int height, int numMines, bool noGuess, Action onVictory, int noGuessTimeoutMs = 1500)
     {
         Width = width;
         Height = height;
@@ -29,6 +30,7 @@ public class MinesweeperGame
         _stopwatch = new Stopwatch();
         _noGuess = noGuess;
         _noGuessGenerator = new NoGuessGenerator(Width, Height, NumMines, noGuessTimeoutMs);
+        NoGuessValid = true;
         _onVictory = onVictory;
     }
 
@@ -39,7 +41,16 @@ public class MinesweeperGame
         if (!_firstMoveTaken)
         {
             _boardBuilder.WithClearPosition(x, y);
-            Board = _noGuess ? _noGuessGenerator.Generate(x, y) : _boardBuilder.Build();
+            try
+            {
+                Board = _noGuess ? _noGuessGenerator.Generate(x, y) : _boardBuilder.Build();
+                NoGuessValid = true;
+            }
+            catch
+            {
+                Board = _boardBuilder.Build();
+                NoGuessValid = false;
+            }
             _firstMoveTaken = true;
             _stopwatch.Start();
         }

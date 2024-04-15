@@ -14,7 +14,7 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(300, 280);
+        Size = new Vector2(310, 250);
         SizeCondition = ImGuiCond.Once;
 
         _configuration = plugin.Configuration;
@@ -70,11 +70,11 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Dummy(new Vector2(0,20));
 
-        var devMode = _configuration.DevMode;
-        if (ImGui.Checkbox("Dev mode", ref devMode))
-        {
-            _configuration.DevMode = devMode;
-        }
+        //var devMode = _configuration.DevMode;
+        //if (ImGui.Checkbox("Dev mode", ref devMode))
+        //{
+        //    _configuration.DevMode = devMode;
+        //}
 
         var noGuess = _configuration.NoGuess;
         if (ImGui.Checkbox("No guess mode", ref noGuess))
@@ -91,8 +91,13 @@ public class ConfigWindow : Window, IDisposable
             }
             if (ImGui.IsItemHovered())
             {
-                ImGui.SetTooltip("How long in milliseconds the algorithm is allowed when trying to generate a no guess board. Larger boards with more mines take more time.~");
+                ImGui.SetTooltip("How long in milliseconds the algorithm is allowed when trying to generate a no guess board.\n" +
+                    "Larger boards with more mines take exponentially more time.");
             }
+        }
+        else
+        {
+            ImGui.Dummy(new Vector2(0, 26));
         }
 
         ImGui.Dummy(new Vector2(0, 20));

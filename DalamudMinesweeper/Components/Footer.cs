@@ -50,14 +50,21 @@ public class Footer
         }
         ImGui.SameLine();
 
-        if (_configuration.DevMode)
+        if (!Game.NoGuessValid)
         {
-            if (ImGui.Button("Sweep"))
-            {
-                _sweeper.SweepAsync(Game);
-            }
-            ImGui.SameLine();
-            ImGui.Text($"{(_sweeper.Swept ? "Swept" : "Stalled" )} after {_sweeper.NumSimpleSteps} simple steps and {_sweeper.NumTankSteps} tank steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
+            ImGui.Text("[No-guess failed]");
         }
+
+
+        //ImGui.SameLine();
+        //if (_configuration.DevMode)
+        //{
+        //    if (ImGui.Button("Sweep"))
+        //    {
+        //        _sweeper.SweepAsync(Game);
+        //    }
+        //    ImGui.SameLine();
+        //    ImGui.Text($"{(_sweeper.Swept ? "Swept" : "Stalled")} after {_sweeper.NumSimpleSteps} simple steps and {_sweeper.NumTankSteps} tank steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
+        //}
     }
 }

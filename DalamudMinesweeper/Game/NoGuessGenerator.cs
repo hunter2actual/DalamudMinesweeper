@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DalamudMinesweeper.Game;
@@ -27,7 +28,9 @@ public class NoGuessGenerator
 
     public Board Generate(int initialX, int initialY)
     {
-        // TODO timeout in here, not just in sweeper
+        var cts = new CancellationTokenSource();
+        cts.CancelAfter(_noGuessTimeoutMs);
+        var ct = cts.Token;
 
         _sweeper.Timeout = TimeSpan.FromMilliseconds(_noGuessTimeoutMs);
 
@@ -36,10 +39,11 @@ public class NoGuessGenerator
 
         while (!succeeded)
         {
+            ct.ThrowIfCancellationRequested();
             List<Task<(bool swept, Board board)>> tasks = [];
             for (int i = 0; i < 5; i++)
             {
-                tasks.Add(TestBoard(initialX, initialY));
+                tasks.Add(TestBoard(initialX, initialY, ct));
             }
             Task.WaitAll(tasks.ToArray());
             if (tasks.Select(t => t.Result).Any(x => x.swept))
@@ -55,7 +59,7 @@ public class NoGuessGenerator
     private MinesweeperGame DummyGame()
         => new MinesweeperGame(_width, _height, _numMines, false, () => { });
 
-    private async Task<(bool swept, Board board)> TestBoard(int initialX, int initialY)
+    private async Task<(bool swept, Board board)> TestBoard(int initialX, int initialY, CancellationToken ct)
     {
         var game = DummyGame();
         game.Click(initialX, initialY);

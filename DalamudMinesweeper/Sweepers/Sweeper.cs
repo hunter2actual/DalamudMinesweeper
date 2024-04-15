@@ -22,17 +22,21 @@ public class Sweeper
 
     public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(2);
 
-    public async Task SweepAsync(MinesweeperGame game)
+    public async Task SweepAsync(MinesweeperGame game, CancellationToken? ct = null)
     {
-        var cts = new CancellationTokenSource();
-        cts.CancelAfter(Timeout);
+        if (ct is null)
+        {
+            var cts = new CancellationTokenSource();
+            cts.CancelAfter(Timeout);
+            ct = cts.Token;
+        }        
         Stopwatch.Restart();
         NumSimpleSteps = NumTankSteps = 0;
         Swept = false;
 
         try
         {
-            while(Simple(game) || await TankAsync(game, cts.Token))
+            while(Simple(game) || await TankAsync(game, ct.Value))
             {
                 // no-op
             }

@@ -16,7 +16,7 @@ public class Configuration : IPluginConfiguration
     public int Zoom { get; set; } = 2;
     public bool DevMode { get; set; } = false;
     public bool NoGuess { get; set; } = false;
-    public int NoGuessTimeoutMs { get; set; } = 3000;
+    public int NoGuessTimeoutMs { get; set; } = 1500;
 
     public Scores Scores { get; set; } = new Scores([]);
 

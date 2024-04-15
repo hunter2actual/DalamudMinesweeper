@@ -49,7 +49,9 @@ public class ConfigWindow : Window, IDisposable
         {
             if (width < 5) width = 5;
             if (width > 99) width = 99;
-            _configuration.BoardWidth = width;            
+            _configuration.BoardWidth = width;
+            
+            _configuration.NumMines = Math.Min(MaxMines, _configuration.NumMines);
         }
 
         var height = _configuration.BoardHeight;
@@ -57,14 +59,16 @@ public class ConfigWindow : Window, IDisposable
         {
             if (height < 5) height = 5;
             if (height > 99) height = 99;
-            _configuration.BoardHeight = height;            
+            _configuration.BoardHeight = height;
+
+            _configuration.NumMines = Math.Min(MaxMines, _configuration.NumMines);
         }
 
         var numMines = _configuration.NumMines;
         if (ImGui.InputInt("Number of mines", ref numMines))
         {
             if (numMines <= 1) numMines = 1;
-            numMines = Math.Min(_configuration.BoardWidth*_configuration.BoardHeight - 9, numMines);
+            numMines = Math.Min(MaxMines, numMines);
             _configuration.NumMines = numMines;   
         }
 
@@ -118,4 +122,6 @@ public class ConfigWindow : Window, IDisposable
             IsOpen = false;
         }
     }
+
+    private int MaxMines => _configuration.BoardWidth * _configuration.BoardHeight - 9;
 }

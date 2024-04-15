@@ -114,7 +114,9 @@ public class MainWindow : Window, IDisposable
             _configuration.BoardWidth,
             _configuration.BoardHeight,
             _configuration.NumMines,
-            RecordScore);
+            _configuration.NoGuess,
+            RecordScore,
+            _configuration.NoGuessTimeoutMs);
 
         if (_header is not null) 
         {

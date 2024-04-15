@@ -15,7 +15,6 @@ public class Footer
     private Action _drawConfigAction;
     private Action _drawScoresAction;
     private readonly Sweeper _sweeper;
-    private bool? _swept;
 
     public Footer(MinesweeperGame game, Configuration configuration, Action drawConfigAction, Action drawScoresAction, Sweeper sweeper)
     {
@@ -55,13 +54,10 @@ public class Footer
         {
             if (ImGui.Button("Sweep"))
             {
-                _swept = _sweeper.Sweep(Game);
+                _sweeper.SweepAsync(Game);
             }
             ImGui.SameLine();
-            if (_swept is not null)
-            {
-               ImGui.Text($"{(_swept.Value ? "Swept" : "Stalled" )} after {_sweeper.NumSimpleSteps} simple steps and {_sweeper.NumTankSteps} tank steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
-            }
+            ImGui.Text($"{(_sweeper.Swept ? "Swept" : "Stalled" )} after {_sweeper.NumSimpleSteps} simple steps and {_sweeper.NumTankSteps} tank steps in {_sweeper.Stopwatch.ElapsedMilliseconds}ms");
         }
     }
 }

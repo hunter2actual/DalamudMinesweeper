@@ -3,7 +3,33 @@ using System.Linq;
 
 namespace DalamudMinesweeper.Game;
 
-public static class BoardExtensions {
+public static class BoardExtensions
+{
+    public static Board From(Board board)
+    {
+        var result = new Board
+        {
+            width = board.width,
+            height = board.height,
+            cells = new Cell[board.width, board.height]
+        };
+        for (int x = 0; x < board.width; x++)
+        {
+            for (int y = 0; y < board.height; y++)
+            {
+                var c = board.cells[x, y];
+                result.cells[x, y] = new Cell
+                {
+                    numNeighbouringMines = c.numNeighbouringMines,
+                    isFlagged = c.isFlagged,
+                    isRevealed = c.isRevealed,
+                    contents = c.contents
+                };
+            }
+        }
+        return result;
+    }
+
     public static Board RevealAll(this Board board)
     {
         for (int x = 0; x < board.width; x++) {

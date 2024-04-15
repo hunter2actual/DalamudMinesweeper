@@ -15,6 +15,8 @@ public class Configuration : IPluginConfiguration
     public int NumMines { get; set; } = 40;
     public int Zoom { get; set; } = 2;
     public bool DevMode { get; set; } = false;
+    public bool NoGuess { get; set; } = false;
+    public int NoGuessTimeoutMs { get; set; } = 3000;
 
     public Scores Scores { get; set; } = new Scores([]);
 

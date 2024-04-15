@@ -4,19 +4,21 @@ using System.Linq;
 
 namespace DalamudMinesweeper.Game;
 
-public class MinesweeperGame {
-
+public class MinesweeperGame
+{
     public int Width { get; init; }
     public int Height { get; init; }
     public int NumMines { get; init; }
     private BoardBuilder _boardBuilder;
+    private NoGuessGenerator _noGuessGenerator;
     public Board Board;
     public GameState GameState { get; private set; }
     private bool _firstMoveTaken;
     private Stopwatch _stopwatch;
+    private readonly bool _noGuess;
     private Action _onVictory;
 
-    public MinesweeperGame(int width, int height, int numMines, Action onVictory)
+    public MinesweeperGame(int width, int height, int numMines, bool noGuess, Action onVictory, int noGuessTimeoutMs = 3000)
     {
         Width = width;
         Height = height;
@@ -25,6 +27,8 @@ public class MinesweeperGame {
         Board = _boardBuilder.Build();
         GameState = GameState.Playing;
         _stopwatch = new Stopwatch();
+        _noGuess = noGuess;
+        _noGuessGenerator = new NoGuessGenerator(Width, Height, NumMines, noGuessTimeoutMs);
         _onVictory = onVictory;
     }
 
@@ -32,9 +36,10 @@ public class MinesweeperGame {
     {
         if (GameState != GameState.Playing) return;
 
-        if (!_firstMoveTaken) {
+        if (!_firstMoveTaken)
+        {
             _boardBuilder.WithClearPosition(x, y);
-            Board = _boardBuilder.Build();
+            Board = _noGuess ? _noGuessGenerator.Generate(x, y) : _boardBuilder.Build();
             _firstMoveTaken = true;
             _stopwatch.Start();
         }

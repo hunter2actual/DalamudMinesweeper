@@ -1,14 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using DalamudMinesweeper.Game;
 
 namespace DalamudMinesweeper.Sweepers;
 
 // TODOs:
 // Segregate
-// Make async
-// Run only once when simple has exhausted itself, and check state before and after entire sweeper run
 
 public class TankSweeperStep
 {
@@ -17,7 +17,52 @@ public class TankSweeperStep
     private record HypotheticalCell(int X, int Y, HypotheticalCellContents contents, int NumRemainingFlags);
     private enum HypotheticalCellContents { Irrelevant, HiddenUnsure, HiddenWithFlag, HiddenWithoutFlag, RevealedNumber }
 
-    private static readonly int HiddenTileLimit = 15; // Exponential time, so this is important
+    private static readonly int HiddenTileLimit = 14; // Exponential time, so this is important
+
+    public static Task<bool> StepAsync(MinesweeperGame game, CancellationToken ct)
+    {
+        var preState = SweeperGameState.From(game);
+        var numPlacedFlags = GetNumFlags(game);
+        var numRemainingMines = game.NumUnflaggedMines();
+
+        var (numbersBorderingHiddens, hiddensBorderingNumbers) = FindRelevantCells(game);
+        if (numbersBorderingHiddens.Count == 0 || hiddensBorderingNumbers.Count == 0)
+            return Task.FromResult(false);
+
+        if (hiddensBorderingNumbers.Count >= HiddenTileLimit)
+            return Task.FromResult(false);
+
+        ct.ThrowIfCancellationRequested();
+
+        var flagCombinations = FlagCombinations(hiddensBorderingNumbers.Count)
+            .Where(fc => fc.Count(x => x is true) <= numRemainingMines || !fc.Any(x => x is true)) // can't place more flags than we have remaining mines
+            .ToList();
+
+        if (flagCombinations.Count == 0)
+            return Task.FromResult(false);
+
+        ct.ThrowIfCancellationRequested();
+
+        var hypotheticals = CreateHypotheticals(game, numbersBorderingHiddens, hiddensBorderingNumbers, flagCombinations);
+
+        if (hypotheticals.Count == 0)
+            return Task.FromResult(false);
+
+        var validHypotheticals = hypotheticals.Where(h => IsValidHypothetical(game, h)).ToList();
+
+        if (validHypotheticals.Count == 0)
+            return Task.FromResult(false);
+
+        ct.ThrowIfCancellationRequested();
+
+        var confirmedState = CondenseHypotheticals(game, validHypotheticals);
+
+        ActOnState(game, confirmedState);
+
+        var postState = SweeperGameState.From(game);
+
+        return Task.FromResult(preState != postState);
+    }
 
     /*
      * Considering groups of "border" tiles (hidden tiles adjacent to a number),

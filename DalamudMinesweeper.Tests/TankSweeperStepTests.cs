@@ -22,7 +22,30 @@ public class TankSweeperStepTests
         Assert.Equal(GameState.Playing, game.GameState);
         Assert.True(TankSweeperStep.Step(game)); // first step solves
         Assert.Equal(GameState.Victorious, game.GameState);
-        Assert.False(SimpleSweeperStep.Step(game)); // second step no effect
+        Assert.False(TankSweeperStep.Step(game)); // second step no effect
+    }
+
+    [Fact]
+    public async Task TrivialTankTestAsync()
+    {
+        var board = new string[]
+        {
+            "     ",
+            "     ",
+            "     ",
+            "   11",
+            "   1*"
+        };
+
+        var game = TestHelpers.InitialiseGame(board, 0, 0);
+
+        var cts = new CancellationTokenSource();
+        var ct = cts.Token;
+
+        Assert.Equal(GameState.Playing, game.GameState);
+        Assert.True(await TankSweeperStep.StepAsync(game, ct)); // first step solves
+        Assert.Equal(GameState.Victorious, game.GameState);
+        Assert.False(await TankSweeperStep.StepAsync(game, ct)); // second step no effect
     }
 
     [Fact]
@@ -40,7 +63,7 @@ public class TankSweeperStepTests
         Assert.Equal(GameState.Playing, game.GameState);
         Assert.True(TankSweeperStep.Step(game)); // first step solves
         Assert.Equal(GameState.Victorious, game.GameState);
-        Assert.False(SimpleSweeperStep.Step(game)); // second step no effect
+        Assert.False(TankSweeperStep.Step(game)); // second step no effect
     }
 
     [Fact]
@@ -80,7 +103,7 @@ public class TankSweeperStepTests
         Assert.Equal(GameState.Playing, game.GameState);
         Assert.True(TankSweeperStep.Step(game)); // first step solves
         Assert.Equal(GameState.Victorious, game.GameState);
-        Assert.False(SimpleSweeperStep.Step(game)); // second step no effect
+        Assert.False(TankSweeperStep.Step(game)); // second step no effect
     }
 
     [Fact]
@@ -104,7 +127,7 @@ public class TankSweeperStepTests
         Assert.Equal(GameState.Playing, game.GameState);
         Assert.True(TankSweeperStep.Step(game)); // first step solves
         Assert.Equal(GameState.Victorious, game.GameState);
-        Assert.False(SimpleSweeperStep.Step(game)); // second step no effect
+        Assert.False(TankSweeperStep.Step(game)); // second step no effect
     }
 
     //[Fact]

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 using DalamudMinesweeper.Game;
 
 namespace DalamudMinesweeper.Sweepers;
@@ -17,45 +18,44 @@ public class Sweeper
     public Stopwatch Stopwatch { get; init; }
     public int NumSimpleSteps { get; private set; }
     public int NumTankSteps { get; private set; }
-    private readonly TimeSpan Timeout = TimeSpan.FromSeconds(1);
+    public bool Swept { get; private set; }
 
-    public bool Sweep(MinesweeperGame game)
+    public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(2);
+
+    public async Task SweepAsync(MinesweeperGame game)
     {
+        var cts = new CancellationTokenSource();
+        cts.CancelAfter(Timeout);
         Stopwatch.Restart();
         NumSimpleSteps = NumTankSteps = 0;
-        do
+        Swept = false;
+
+        try
         {
-            do
+            while(Simple(game) || await TankAsync(game, cts.Token))
             {
-                NumSimpleSteps++;
-            } while (SimpleSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
-            NumTankSteps++;
-        } while (TankSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
-        Stopwatch.Stop();
-        return game.GameState == GameState.Victorious;
+                // no-op
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            Stopwatch.Stop();
+            Swept = game.GameState == GameState.Victorious;
+        }
     }
 
-    public bool SimpleSweep(MinesweeperGame game)
+    private bool Simple(MinesweeperGame game)
     {
-        Stopwatch.Restart();
-        NumSimpleSteps = 0;
-        do
-        {
-            NumSimpleSteps++;
-        } while (SimpleSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
-        Stopwatch.Stop();
-        return game.GameState == GameState.Victorious;
+        NumSimpleSteps++;
+        return SimpleSweeperStep.Step(game);
     }
 
-    public bool TankSweep(MinesweeperGame game)
+    private Task<bool> TankAsync(MinesweeperGame game, CancellationToken ct)
     {
-        Stopwatch.Restart();
-        NumTankSteps = 0;
-        do 
-        {
-            NumTankSteps++;
-        } while (TankSweeperStep.Step(game) && Stopwatch.Elapsed < Timeout);
-        Stopwatch.Stop();
-        return game.GameState == GameState.Victorious;
+        NumTankSteps++;
+        return TankSweeperStep.StepAsync(game, ct);
     }
 }

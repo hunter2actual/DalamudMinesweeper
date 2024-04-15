@@ -11,10 +11,11 @@ public class ConfigWindow : Window, IDisposable
 
     public ConfigWindow(Plugin plugin) : base(
         "Minesweeper Settings",
-        ImGuiWindowFlags.NoCollapse | ImGuiWindowFlags.NoScrollbar |
+        ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(350, 240);
+        Size = new Vector2(300, 280);
+        SizeCondition = ImGuiCond.Once;
 
         _configuration = plugin.Configuration;
     }
@@ -67,15 +68,7 @@ public class ConfigWindow : Window, IDisposable
             _configuration.NumMines = numMines;   
         }
 
-        if (ImGui.Button("Reset zoom level"))
-        {
-            _configuration.Zoom = 2;
-        }
-
-        if (ImGui.Button("Clear scores"))
-        {
-            _configuration.Scores = new Game.Scores([]);
-        }
+        ImGui.Dummy(new Vector2(0,20));
 
         var devMode = _configuration.DevMode;
         if (ImGui.Checkbox("Dev mode", ref devMode))
@@ -83,6 +76,38 @@ public class ConfigWindow : Window, IDisposable
             _configuration.DevMode = devMode;
         }
 
+        var noGuess = _configuration.NoGuess;
+        if (ImGui.Checkbox("No guess mode", ref noGuess))
+        {
+            _configuration.NoGuess = noGuess;
+        }
+
+        if (_configuration.NoGuess)
+        {
+            var noGuessTimeoutMs = _configuration.NoGuessTimeoutMs;
+            if (ImGui.InputInt("Timeout (ms)", ref noGuessTimeoutMs, 100))
+            {
+                _configuration.NoGuessTimeoutMs = noGuessTimeoutMs;
+            }
+            if (ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip("How long in milliseconds the algorithm is allowed when trying to generate a no guess board. Larger boards with more mines take more time.~");
+            }
+        }
+
+        ImGui.Dummy(new Vector2(0, 20));
+
+
+        if (ImGui.Button("Reset zoom level"))
+        {
+            _configuration.Zoom = 2;
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Clear scores"))
+        {
+            _configuration.Scores = new Game.Scores([]);
+        }
+        ImGui.SameLine();
         if (ImGui.Button("Save and Close")) {
             _configuration.Save();
             IsOpen = false;

@@ -57,7 +57,7 @@ public class NoGuessGenerator
     }
 
     private MinesweeperGame DummyGame()
-        => new MinesweeperGame(_width, _height, _numMines, false, () => { });
+        => new MinesweeperGame(_width, _height, _numMines, false, () => { }, revealShortcut: true, flagShortcut: false);
 
     private async Task<(bool swept, Board board)> TestBoard(int initialX, int initialY, CancellationToken ct)
     {

@@ -4,7 +4,6 @@ Dalamud plugin for FFXIV, install by adding `https://raw.githubusercontent.com/h
 
 How to play:
 - Left click to uncover a square, right click to place a flag.
-- Click a number that has the right amount of adjacent flags to reveal adjacent tiles.
 - The game ends when all mines are flagged and all safe squares have been uncovered.
 - Click the smiley face to start a new game.
 
@@ -12,6 +11,7 @@ Features:
 - Score board
 - No-guess mode!
 - 3 difficulty presets
+- Optional shortcuts
 
 ![Minesweeper plugin screenshot](/images/screenshot.png?raw=true "Minesweeper plugin screenshot")
 

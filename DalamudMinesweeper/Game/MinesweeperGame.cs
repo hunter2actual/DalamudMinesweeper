@@ -18,8 +18,12 @@ public class MinesweeperGame
     private Stopwatch _stopwatch;
     private readonly bool _noGuess;
     private Action _onVictory;
+    private readonly bool _revealShortcut;
+    private readonly bool _flagShortcut;
 
-    public MinesweeperGame(int width, int height, int numMines, bool noGuess, Action onVictory, int noGuessTimeoutMs = 1500)
+
+    public MinesweeperGame(int width, int height, int numMines, bool noGuess, Action onVictory,
+                           int noGuessTimeoutMs = 1500, bool revealShortcut = false, bool flagShortcut = false)
     {
         Width = width;
         Height = height;
@@ -32,6 +36,8 @@ public class MinesweeperGame
         _noGuessGenerator = new NoGuessGenerator(Width, Height, NumMines, noGuessTimeoutMs);
         NoGuessValid = true;
         _onVictory = onVictory;
+        _revealShortcut = revealShortcut;
+        _flagShortcut = flagShortcut;
     }
 
     public void Click(int x, int y)
@@ -66,7 +72,7 @@ public class MinesweeperGame
                 RevealAll();
                 break;
             case CellContents.Number:
-                if (cell.isRevealed && Board.CellIsFulfilled(x, y))
+                if (_revealShortcut && cell.isRevealed && Board.CellIsFulfilledForRevealing(x, y))
                 {
                     Board.ClickAdjacentUnflaggedTiles(x, y, Click);
                 }
@@ -87,6 +93,13 @@ public class MinesweeperGame
     public void RightClick(int x, int y)
     {
         if (GameState != GameState.Playing || !_firstMoveTaken) return;
+
+        if (_flagShortcut)
+        {
+            var cell = GetCell(x, y);
+            if (cell.contents is CellContents.Number && Board.CellIsFulfilledForFlagging(x, y))
+                Board.FlagAdjacentHiddenTiles(x, y, RightClick);
+        }
 
         Board.ToggleCellFlag(x, y);
 

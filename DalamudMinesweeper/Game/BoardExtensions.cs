@@ -74,7 +74,7 @@ public static class BoardExtensions
         return board.cells[x, y].isFlagged = !board.cells[x, y].isFlagged;
     }
 
-    public static bool CellIsFulfilled(this Board board, int x, int y)
+    public static bool CellIsFulfilledForRevealing(this Board board, int x, int y)
     {
         var currentCell = board.cells[x, y];
         if (currentCell.contents != CellContents.Number || currentCell.isFlagged)
@@ -103,6 +103,38 @@ public static class BoardExtensions
         return neighbouringFlags == currentCell.numNeighbouringMines;
     }
 
+    public static bool CellIsFulfilledForFlagging(this Board board, int x, int y)
+    {
+        var currentCell = board.cells[x, y];
+        if (currentCell.contents != CellContents.Number || currentCell.isFlagged)
+            return false;
+
+        var neighbouringHidden = 0;
+
+        // Loop through a square around the current cell
+        for (int y2 = y - 1; y2 <= y + 1; y2++)
+        {
+            for (int x2 = x - 1; x2 <= x + 1; x2++)
+            {
+                // Skip self
+                if (x2 == x && y2 == y)
+                    continue;
+
+                // Avoid out of bounds
+                if (x2 < 0 || y2 < 0 || x2 >= board.width || y2 >= board.height)
+                    continue;
+
+                var neighbourCell = board.cells[x2, y2];
+                if (!neighbourCell.isRevealed)
+                {
+                    neighbouringHidden++;
+                }
+            }
+        }
+
+        return neighbouringHidden == currentCell.numNeighbouringMines;
+    }
+
     public static void ClickAdjacentUnflaggedTiles(this Board board, int x, int y, Action<int, int> clickAction)
     {
         var currentCell = board.cells[x, y];
@@ -124,6 +156,35 @@ public static class BoardExtensions
                 if (!neighbourCell.isFlagged && !neighbourCell.isRevealed)
                 {
                     clickAction(x2, y2);
+                }
+            }
+        }
+        return;
+    }
+
+    public static void FlagAdjacentHiddenTiles(this Board board, int x, int y, Action<int, int> rightClickAction)
+    {
+        var currentCell = board.cells[x, y];
+        if (currentCell.contents != CellContents.Number || currentCell.isFlagged)
+            return;
+
+        // Loop through a square around the current cell
+        for (int y2 = y - 1; y2 <= y + 1; y2++)
+        {
+            for (int x2 = x - 1; x2 <= x + 1; x2++)
+            {
+                // Skip self
+                if (x2 == x && y2 == y)
+                    continue;
+
+                // Avoid out of bounds
+                if (x2 < 0 || y2 < 0 || x2 >= board.width || y2 >= board.height)
+                    continue;
+
+                var neighbourCell = board.cells[x2, y2];
+                if (!neighbourCell.isFlagged && !neighbourCell.isRevealed)
+                {
+                    rightClickAction(x2, y2);
                 }
             }
         }

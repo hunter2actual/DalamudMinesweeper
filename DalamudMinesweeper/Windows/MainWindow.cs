@@ -116,7 +116,9 @@ public class MainWindow : Window, IDisposable
             _configuration.NumMines,
             _configuration.NoGuess,
             RecordScore,
-            _configuration.NoGuessTimeoutMs);
+            _configuration.NoGuessTimeoutMs,
+            _configuration.RevealShortcut,
+            _configuration.FlagShortcut);
 
         if (_header is not null) 
         {

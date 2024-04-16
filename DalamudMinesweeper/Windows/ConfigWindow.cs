@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
 
@@ -14,7 +15,7 @@ public class ConfigWindow : Window, IDisposable
         ImGuiWindowFlags.NoScrollbar |
         ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(310, 250);
+        Size = new Vector2(380, 380);
         SizeCondition = ImGuiCond.Once;
 
         _configuration = plugin.Configuration;
@@ -24,6 +25,7 @@ public class ConfigWindow : Window, IDisposable
 
     public override void Draw()
     {
+        ImGui.Text("Difficulty:");
         // Difficulty buttons
         if (ImGui.Button("Easy")) {
             _configuration.BoardWidth = 9;
@@ -44,6 +46,7 @@ public class ConfigWindow : Window, IDisposable
         }
 
         // Config setters
+        ImGui.PushItemWidth(150f * ImGuiHelpers.GlobalScale);
         var width = _configuration.BoardWidth;
         if (ImGui.InputInt("Board width", ref width))
         {
@@ -72,7 +75,7 @@ public class ConfigWindow : Window, IDisposable
             _configuration.NumMines = numMines;   
         }
 
-        ImGui.Dummy(new Vector2(0,20));
+        ImGui.Dummy(new Vector2(0, 30));
 
         //var devMode = _configuration.DevMode;
         //if (ImGui.Checkbox("Dev mode", ref devMode))
@@ -80,8 +83,9 @@ public class ConfigWindow : Window, IDisposable
         //    _configuration.DevMode = devMode;
         //}
 
+        ImGui.Text("No guess mode:");
         var noGuess = _configuration.NoGuess;
-        if (ImGui.Checkbox("No guess mode", ref noGuess))
+        if (ImGui.Checkbox("Enable no guess mode", ref noGuess))
         {
             _configuration.NoGuess = noGuess;
         }
@@ -104,7 +108,30 @@ public class ConfigWindow : Window, IDisposable
             ImGui.Dummy(new Vector2(0, 26));
         }
 
-        ImGui.Dummy(new Vector2(0, 20));
+        ImGui.Dummy(new Vector2(0, 30));
+
+        ImGui.Text("Shortcuts:");
+        var revealShortcut = _configuration.RevealShortcut;
+        if (ImGui.Checkbox("Click on a number to automatically reveal adjacent tiles", ref revealShortcut))
+        {
+            _configuration.RevealShortcut = revealShortcut;
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Only when the number already has the appropriate number of adjacent flags.");
+        }
+        var flagShortcut = _configuration.FlagShortcut;
+        if (ImGui.Checkbox("Right click on a number to automatically place adjacent flags", ref flagShortcut))
+        {
+            _configuration.FlagShortcut = flagShortcut;
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Only when the number has the appropriate number of adjacent hidden tiles.");
+        }
+
+
+        ImGui.Dummy(new Vector2(0, 37));
 
 
         if (ImGui.Button("Reset zoom level"))

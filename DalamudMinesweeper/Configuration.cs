@@ -2,7 +2,6 @@
 using Dalamud.Plugin;
 using DalamudMinesweeper.Game;
 using System;
-using System.Collections.Generic;
 
 namespace DalamudMinesweeper;
 
@@ -17,6 +16,8 @@ public class Configuration : IPluginConfiguration
     public bool DevMode { get; set; } = false;
     public bool NoGuess { get; set; } = false;
     public int NoGuessTimeoutMs { get; set; } = 1500;
+    public bool RevealShortcut { get; set; } = false;
+    public bool FlagShortcut { get; set; } = false;
 
     public Scores Scores { get; set; } = new Scores([]);
 

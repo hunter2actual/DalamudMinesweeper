@@ -59,8 +59,7 @@ public sealed class Plugin : IDalamudPlugin
 
     private void OnCommand(string command, string args)
     {
-        // in response to the slash command, just display our main ui
-        _mainWindow.IsOpen = true;
+        _mainWindow.IsOpen = !_mainWindow.IsOpen;
     }
 
     private void DrawUI()
@@ -70,16 +69,16 @@ public sealed class Plugin : IDalamudPlugin
 
     private void DrawMainUI()
     {
-        _mainWindow.IsOpen = true;
+        _mainWindow.IsOpen = !_mainWindow.IsOpen;
     }
 
     public void DrawConfigUI()
     {
-        _configWindow.IsOpen = true;
+        _configWindow.IsOpen = !_configWindow.IsOpen;
     }
 
     public void DrawScoresUI()
     {
-        _scoresWindow.IsOpen = true;
+        _scoresWindow.IsOpen = !_scoresWindow.IsOpen;
     }
 }

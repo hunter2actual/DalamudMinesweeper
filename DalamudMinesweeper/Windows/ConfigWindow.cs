@@ -13,10 +13,11 @@ public class ConfigWindow : Window, IDisposable
     public ConfigWindow(Plugin plugin) : base(
         "Minesweeper Settings",
         ImGuiWindowFlags.NoScrollbar |
-        ImGuiWindowFlags.NoScrollWithMouse)
+        ImGuiWindowFlags.NoScrollWithMouse |
+        ImGuiWindowFlags.NoResize)
     {
-        Size = new Vector2(380, 380);
-        SizeCondition = ImGuiCond.Once;
+        Size = new Vector2(390, 420);
+        SizeCondition = ImGuiCond.Always;
 
         _configuration = plugin.Configuration;
     }

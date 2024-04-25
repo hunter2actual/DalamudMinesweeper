@@ -33,20 +33,36 @@ public class Footer
         {
             _drawScoresAction();
         };
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("View high scores");
+        }
         ImGui.SameLine();
         if (ImGuiComponents.IconButton(FontAwesomeIcon.Cog))
         {
             _drawConfigAction();
-        }        
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Settings");
+        }
         ImGui.SameLine();
         if (ImGuiComponents.IconButton(FontAwesomeIcon.Plus) && _configuration.Zoom < 5)
         {
             _configuration.Zoom++;
         }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Zoom in");
+        }
         ImGui.SameLine();
         if (ImGuiComponents.IconButton(FontAwesomeIcon.Minus) && _configuration.Zoom > 1)
         {
             _configuration.Zoom--;
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Zoom out");
         }
         ImGui.SameLine();
 

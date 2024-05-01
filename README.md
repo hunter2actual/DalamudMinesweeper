@@ -1,6 +1,7 @@
 # DalamudMinesweeper
 
-Dalamud plugin for FFXIV, install by adding `https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/DalamudMinesweeper.json` to your plugin sources.
+Dalamud plugin for FFXIV, now available in the main Dalamud repository!
+For dev builds, install by adding `https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/DalamudMinesweeper.json` to your plugin sources.
 
 How to play:
 - Left click to uncover a square, right click to place a flag.
@@ -10,7 +11,7 @@ How to play:
 Features:
 - Score board
 - No-guess mode!
-- 3 difficulty presets
+- 4 difficulty presets
 - Optional shortcuts
 
 ![Minesweeper plugin screenshot](/images/screenshot.png?raw=true "Minesweeper plugin screenshot")

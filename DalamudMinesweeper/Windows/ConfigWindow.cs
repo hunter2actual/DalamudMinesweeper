@@ -28,21 +28,31 @@ public class ConfigWindow : Window, IDisposable
     {
         ImGui.Text("Difficulty:");
         // Difficulty buttons
-        if (ImGui.Button("Easy")) {
+        if (ImGui.Button("Easy"))
+        {
             _configuration.BoardWidth = 9;
             _configuration.BoardHeight = 9;
             _configuration.NumMines = 10;
         }
         ImGui.SameLine();
-        if (ImGui.Button("Medium")) {
+        if (ImGui.Button("Medium"))
+        {
             _configuration.BoardWidth = 16;
             _configuration.BoardHeight = 16;
             _configuration.NumMines = 40;
         }
         ImGui.SameLine();
-        if (ImGui.Button("Hard")) {
+        if (ImGui.Button("Hard"))
+        {
             _configuration.BoardWidth = 24;
             _configuration.BoardHeight = 24;
+            _configuration.NumMines = 99;
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("Expert"))
+        {
+            _configuration.BoardWidth = 30;
+            _configuration.BoardHeight = 16;
             _configuration.NumMines = 99;
         }
 
@@ -113,7 +123,7 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Text("Shortcuts:");
         var revealShortcut = _configuration.RevealShortcut;
-        if (ImGui.Checkbox("Click on a number to automatically reveal adjacent tiles", ref revealShortcut))
+        if (ImGui.Checkbox("Left click on a number to automatically reveal adjacent tiles", ref revealShortcut))
         {
             _configuration.RevealShortcut = revealShortcut;
         }

@@ -96,7 +96,7 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Text("No guess mode:");
         var noGuess = _configuration.NoGuess;
-        if (ImGui.Checkbox("Enable no guess mode", ref noGuess))
+        if (ImGui.Checkbox("Enable no guess mode (first click may lag on hard/expert)", ref noGuess))
         {
             _configuration.NoGuess = noGuess;
         }

@@ -30,7 +30,7 @@ public class ScoresWindow : Window, IDisposable
         var easy = new GameParameters(9, 9, 10);
         var medium = new GameParameters(16, 16, 40);
         var hard = new GameParameters(24, 24, 99);
-        var expert = new GameParameters(30, 16, 99);
+        var expert = new GameParameters(16, 30, 99);
 
         var groups = _configuration.Scores.scores.OrderBy(x => x.time).GroupBy(x => x.parameters);
 
@@ -44,11 +44,11 @@ public class ScoresWindow : Window, IDisposable
             && g.First().parameters != hard
             && g.First().parameters != expert);
 
-        if (expertScores is not null && hardScores.Any())
+        if (expertScores is not null && expertScores.Any())
         {
-            if (ImGui.CollapsingHeader("Expert " + GameParametersSummary(hard)))
+            if (ImGui.CollapsingHeader("Expert " + GameParametersSummary(expert)))
             {
-                foreach (var score in hardScores)
+                foreach (var score in expertScores)
                 {
                     ImGui.Text(TimeSummary(score.time));
                 }

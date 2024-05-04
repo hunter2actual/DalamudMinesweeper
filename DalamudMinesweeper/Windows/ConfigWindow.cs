@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using System.Numerics;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Windowing;
@@ -13,11 +14,10 @@ public class ConfigWindow : Window, IDisposable
     public ConfigWindow(Plugin plugin) : base(
         "Minesweeper Settings",
         ImGuiWindowFlags.NoScrollbar |
-        ImGuiWindowFlags.NoScrollWithMouse |
-        ImGuiWindowFlags.NoResize)
+        ImGuiWindowFlags.NoScrollWithMouse)
     {
-        Size = new Vector2(390, 420);
-        SizeCondition = ImGuiCond.Always;
+        Size = new Vector2(395, 460);
+        SizeCondition = ImGuiCond.Appearing;
 
         _configuration = plugin.Configuration;
     }
@@ -86,7 +86,7 @@ public class ConfigWindow : Window, IDisposable
             _configuration.NumMines = numMines;   
         }
 
-        ImGui.Dummy(new Vector2(0, 30));
+        ImGui.Dummy(new Vector2(0, 25 * Scale));
 
         //var devMode = _configuration.DevMode;
         //if (ImGui.Checkbox("Dev mode", ref devMode))
@@ -116,10 +116,10 @@ public class ConfigWindow : Window, IDisposable
         }
         else
         {
-            ImGui.Dummy(new Vector2(0, 26));
+            ImGui.Dummy(new Vector2(0, 23 * Scale));
         }
 
-        ImGui.Dummy(new Vector2(0, 30));
+        ImGui.Dummy(new Vector2(0, 25 * Scale));
 
         ImGui.Text("Shortcuts:");
         var revealShortcut = _configuration.RevealShortcut;
@@ -141,9 +141,10 @@ public class ConfigWindow : Window, IDisposable
             ImGui.SetTooltip("Only when the number has the appropriate number of adjacent hidden tiles.");
         }
 
-
-        ImGui.Dummy(new Vector2(0, 37));
-
+        var topLeft = ImGui.GetWindowContentRegionMin();
+        var bottomRight = ImGui.GetWindowContentRegionMax();
+        var bottomLeft = new Vector2(topLeft.X, bottomRight.Y);
+        ImGui.SetCursorPos(bottomLeft + new Vector2(0, -25) * Scale);
 
         if (ImGui.Button("Reset zoom level"))
         {
@@ -155,11 +156,14 @@ public class ConfigWindow : Window, IDisposable
             _configuration.Scores = new Game.Scores([]);
         }
         ImGui.SameLine();
-        if (ImGui.Button("Save and Close")) {
+        if (ImGui.Button("Save and Close"))
+        {
             _configuration.Save();
             IsOpen = false;
         }
     }
 
     private int MaxMines => _configuration.BoardWidth * _configuration.BoardHeight - 9;
+
+    private static float Scale => ImGui.GetIO().FontGlobalScale;
 }

@@ -1,7 +1,6 @@
 # DalamudMinesweeper
 
-Dalamud plugin for FFXIV, now available in the main Dalamud repository!
-For dev builds, install by adding `https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/DalamudMinesweeper.json` to your plugin sources.
+Dalamud plugin for FFXIV.
 
 How to play:
 - Left click to uncover a square, right click to place a flag.

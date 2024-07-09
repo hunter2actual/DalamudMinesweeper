@@ -6,6 +6,7 @@ using DalamudMinesweeper.Game;
 using DalamudMinesweeper.Sweepers;
 using DalamudMinesweeper.Sprites;
 using ImGuiNET;
+using Dalamud.Plugin.Services;
 
 namespace DalamudMinesweeper.Windows;
 
@@ -35,7 +36,7 @@ public class MainWindow : Window, IDisposable
     private Footer _footer;
     private Background _background;
 
-    public MainWindow(Plugin plugin, Configuration configuration) : base("Minesweeper",
+    public MainWindow(Plugin plugin, Configuration configuration, ITextureProvider textureProvider) : base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoScrollWithMouse
             | ImGuiWindowFlags.NoResize
@@ -48,8 +49,8 @@ public class MainWindow : Window, IDisposable
         };
 
         _configuration = configuration;
-        _tileSprites = new TileSprites(plugin.PluginInterface);
-        _numberSprites = new NumberSprites(plugin.PluginInterface);
+        _tileSprites = new TileSprites(Service.PluginInterface);
+        _numberSprites = new NumberSprites(Service.PluginInterface);
         _gridSquareSizePxVec2 = new Vector2(0, 0);
 
         _sweeper = new Sweeper();
@@ -58,12 +59,6 @@ public class MainWindow : Window, IDisposable
         _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
         _footer = new Footer(_game, _configuration, plugin.DrawConfigUI, plugin.DrawScoresUI, _sweeper);
         _background = new Background(_game, _configuration, _borderWidthPx);
-    }
-
-    public void Dispose()
-    {
-        _tileSprites.Dispose();
-        _numberSprites.Dispose();
     }
 
     public override void Draw()
@@ -154,4 +149,6 @@ public class MainWindow : Window, IDisposable
             _canSaveScore = false;
         }
     }
+
+    public void Dispose() { }
 }

@@ -1,32 +1,24 @@
 using Dalamud.Plugin;
-using Dalamud.Interface.Internal;
 using System.IO;
-using System;
 using ImGuiNET;
 using System.Numerics;
 using System.Collections.Generic;
+using Dalamud.Interface.Textures;
+using System;
 
 namespace DalamudMinesweeper.Sprites;
 
-public class NumberSprites : IDisposable
+public class NumberSprites
 {
-    private DalamudPluginInterface _pluginInterface { get; set; }
-    private IDalamudTextureWrap[] Sheets { get; init; }
+    private IDalamudPluginInterface _pluginInterface { get; set; }
+    private ISharedImmediateTexture[] Sheets { get; set; } = Array.Empty<ISharedImmediateTexture>();
     private record SpriteData(Vector2 topLeftCoord, Vector2 sizePx);
     private readonly Dictionary<char, SpriteData> _spriteDict;
+    private bool _loaded = false;
 
-    public NumberSprites(DalamudPluginInterface pluginInterface)
+    public NumberSprites(IDalamudPluginInterface pluginInterface)
     {
         _pluginInterface = pluginInterface;
-
-        Sheets =
-        [
-            LoadImage("numbers_1x.png"),
-            LoadImage("numbers_2x.png"),
-            LoadImage("numbers_3x.png"),
-            LoadImage("numbers_4x.png"),
-            LoadImage("numbers_5x.png"),
-        ];
 
         var numberSpriteSize = new Vector2(13, 23);
 
@@ -54,7 +46,20 @@ public class NumberSprites : IDisposable
 
     private void Draw(ImDrawListPtr drawList, SpriteData sprite, Vector2 cursorPos, int zoom)
     {
-        var sheet = Sheets[zoom - 1];
+        if (!_loaded)
+        {
+            Sheets =
+            [
+                LoadImage("numbers_1x.png"),
+                LoadImage("numbers_2x.png"),
+                LoadImage("numbers_3x.png"),
+                LoadImage("numbers_4x.png"),
+                LoadImage("numbers_5x.png"),
+            ];
+            _loaded = true;
+        }
+
+        var sheet = Sheets[zoom - 1].GetWrapOrDefault();
 
         var uvMin = sprite.topLeftCoord * zoom / sheet.Size;
         var uvMax = (sprite.topLeftCoord + sprite.sizePx) * zoom / sheet.Size;
@@ -67,17 +72,9 @@ public class NumberSprites : IDisposable
             uvMax);
     }
 
-    public void Dispose()
-    {
-        foreach (var sheet in Sheets)
-        {
-            sheet.Dispose();
-        }
-    }
-
-    private IDalamudTextureWrap LoadImage(string path)
+    private ISharedImmediateTexture LoadImage(string path)
     {
         var fullPath = Path.Combine(_pluginInterface.AssemblyLocation.Directory?.FullName!, path);
-        return _pluginInterface.UiBuilder.LoadImage(fullPath);
+        return Service.TextureProvider.GetFromFile(fullPath);
     }
 }

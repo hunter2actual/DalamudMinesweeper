@@ -35,7 +35,7 @@ public sealed class Plugin : IDalamudPlugin
 
         _configWindow = new ConfigWindow(this);
         _scoresWindow = new ScoresWindow(this);
-        _mainWindow = new MainWindow(this, Configuration, Service.TextureProvider);
+        _mainWindow = new MainWindow(this, Configuration);
         
         WindowSystem.AddWindow(_configWindow);
         WindowSystem.AddWindow(_scoresWindow);

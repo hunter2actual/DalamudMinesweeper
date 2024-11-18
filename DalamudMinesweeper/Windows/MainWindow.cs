@@ -6,15 +6,12 @@ using DalamudMinesweeper.Game;
 using DalamudMinesweeper.Sweepers;
 using DalamudMinesweeper.Sprites;
 using ImGuiNET;
-using Dalamud.Plugin.Services;
 
 namespace DalamudMinesweeper.Windows;
 
 public class MainWindow : Window, IDisposable
 {
     private readonly TileSprites _tileSprites;
-    private readonly NumberSprites _numberSprites;
-    private readonly Sweeper _sweeper;
 
     private readonly Configuration _configuration;
     private MinesweeperGame _game;
@@ -24,7 +21,6 @@ public class MainWindow : Window, IDisposable
     // Pixel sizes
     private readonly int _dalamudWindowPaddingPx = 8;
     private int _gridSquareSizePx;
-    private Vector2 _gridSquareSizePxVec2;
     private readonly int _borderWidthPx = 12;
     private readonly Vector2 _borderWidthPxVec2 = new(12, 12);
     private readonly int _titleBarHeightPx = 26;
@@ -36,7 +32,7 @@ public class MainWindow : Window, IDisposable
     private Footer _footer;
     private Background _background;
 
-    public MainWindow(Plugin plugin, Configuration configuration, ITextureProvider textureProvider) : base("Minesweeper",
+    public MainWindow(Plugin plugin, Configuration configuration) : base("Minesweeper",
             ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoScrollWithMouse
             | ImGuiWindowFlags.NoResize
@@ -50,14 +46,12 @@ public class MainWindow : Window, IDisposable
 
         _configuration = configuration;
         _tileSprites = new TileSprites(Service.PluginInterface);
-        _numberSprites = new NumberSprites(Service.PluginInterface);
-        _gridSquareSizePxVec2 = new Vector2(0, 0);
+        var numberSprites = new NumberSprites(Service.PluginInterface);
 
-        _sweeper = new Sweeper();
         _game = InitialiseGame();
         _gameBoard = new GameBoard(_game, _tileSprites, _configuration);
-        _header = new Header(_game, _tileSprites, _numberSprites, _configuration, () => InitialiseGame());
-        _footer = new Footer(_game, _configuration, plugin.DrawConfigUI, plugin.DrawScoresUI, _sweeper);
+        _header = new Header(_game, _tileSprites, numberSprites, _configuration, () => InitialiseGame());
+        _footer = new Footer(_game, _configuration, plugin.DrawConfigUI, plugin.DrawScoresUI, new Sweeper());
         _background = new Background(_game, _configuration, _borderWidthPx);
     }
 
@@ -65,10 +59,9 @@ public class MainWindow : Window, IDisposable
     {
         // Calculate element sizes
         var windowPos = ImGui.GetWindowPos();
-        var headerHeightPx = (int) (_tileSprites.SmileySize.Y + 8)* _configuration.Zoom;
+        var headerHeightPx = (int) (_tileSprites.SmileySize.Y + 8) * _configuration.Zoom;
 
         _gridSquareSizePx = (int) _tileSprites.TileSize.X * _configuration.Zoom;
-        _gridSquareSizePxVec2.X = _gridSquareSizePxVec2.Y = _gridSquareSizePx;
         _boardDimensions = new Vector2(_game.Width, _game.Height);
         var windowWidthPx = _gridSquareSizePx*_boardDimensions.X + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx;
         var windowHeightPx = _gridSquareSizePx*_boardDimensions.Y + 2*_borderWidthPx*_configuration.Zoom + 2*_dalamudWindowPaddingPx

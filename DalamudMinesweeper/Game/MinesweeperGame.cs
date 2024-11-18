@@ -109,6 +109,7 @@ public class MinesweeperGame
     public void Win()
     {
         GameState = GameState.Victorious;
+        FlagAllMines();
         _onVictory();
         _stopwatch.Stop();
     }
@@ -116,6 +117,8 @@ public class MinesweeperGame
     public void RevealAll() => Board.RevealAll();
 
     public void HideAll() => Board.HideAll();
+
+    public void FlagAllMines() => Board.FlagAllMines();
 
     public Cell GetCell(int x, int y) => Board.cells[x, y];
 

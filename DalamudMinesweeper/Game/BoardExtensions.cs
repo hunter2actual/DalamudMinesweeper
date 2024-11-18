@@ -50,6 +50,19 @@ public static class BoardExtensions
         return board;
     }
 
+    public static Board FlagAllMines(this Board board)
+    {
+        for (int x = 0; x < board.width; x++) {
+            for (int y = 0; y < board.height; y++) {
+                if (board.cells[x, y].contents is CellContents.Mine)
+                {
+                    board.cells[x, y].isFlagged = true;
+                }
+            }
+        }
+        return board;
+    }
+
     public static CellContents RevealCell(this Board board, int x, int y)
     {
         board.cells[x, y].isRevealed = true;
@@ -220,18 +233,8 @@ public static class BoardExtensions
         return;
     }
 
-    public static bool IsVictory(this Board board)
-    {
-        var cells = board.cells.ToList();
-
-        var minesAreFlagged = cells
-            .Where(c => c.contents is CellContents.Mine)
-            .All(c => c.isFlagged);
-
-        var nonMinesRevealed = cells
+    public static bool IsVictory(this Board board) =>
+        board.cells.ToList()
             .Where(c => c.contents is not CellContents.Mine)
             .All(c => c.isRevealed);
-
-        return minesAreFlagged && nonMinesRevealed;
-    }
 }

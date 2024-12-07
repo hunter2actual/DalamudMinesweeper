@@ -96,6 +96,18 @@ public class MainWindow : Window, IDisposable
         _footer.Draw(bottomLeft - _footerHeightPxVec2);
     }
 
+    public override void OnClose()
+    {
+        _game.Pause();
+        base.OnClose();
+    }
+
+    public override void OnOpen()
+    {
+        _game.Resume();
+        base.OnOpen();
+    }
+
     private MinesweeperGame InitialiseGame()
     {
         _game = new MinesweeperGame(

@@ -132,4 +132,15 @@ public class MinesweeperGame
 
     public int ElapsedGameTime => (int) _stopwatch.Elapsed.TotalSeconds;
     public long ElapsedGameTimeMs => _stopwatch.ElapsedMilliseconds;
+    public void Pause()
+    {
+        if (_firstMoveTaken)
+            _stopwatch.Stop();
+    }
+
+    public void Resume()
+    {
+        if (_firstMoveTaken)
+            _stopwatch.Start();
+    }
 }

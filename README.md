@@ -4,7 +4,7 @@ Dalamud plugin for FFXIV.
 
 How to play:
 - Left click to uncover a square, right click to place a flag.
-- The game ends when all mines are flagged and all safe squares have been uncovered.
+- The game ends when all safe squares have been uncovered.
 - Click the smiley face to start a new game.
 
 Features:

@@ -3,7 +3,7 @@
     "Author": "hunter2_",
     "Name": "Minesweeper",
     "InternalName": "DalamudMinesweeper",
-    "AssemblyVersion": "1.2.3.0",
+    "AssemblyVersion": "1.3.0.0",
     "Description": "Logic puzzle in which you find and flag hidden mines.\n\nLeft click to uncover a square, right click to place a flag.\nThe game ends when all safe squares have been uncovered.\nClick the smiley face to start a new game.",
     "ApplicableVersion": "any",
     "Tags": [
@@ -11,16 +11,16 @@
       "minigame",
       "puzzle"
     ],
-    "DalamudApiLevel": 9,
+    "DalamudApiLevel": 12,
     "LoadRequiredState": 0,
     "LoadSync": false,
     "CanUnloadAsync": false,
     "LoadPriority": 0,
     "Punchline": "Classic puzzle game.",
     "AcceptsFeedback": true,
-    "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/1.2.3.0/latest.zip",
-    "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/1.2.3.0/latest.zip",
+    "DownloadLinkInstall": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/1.3.0.0/latest.zip",
+    "DownloadLinkUpdate": "https://github.com/hunter2actual/DalamudMinesweeper/releases/download/1.3.0.0/latest.zip",
     "IconUrl": "https://raw.githubusercontent.com/hunter2actual/DalamudMinesweeper/master/images/icon.png",
-    "Changelog": "Pause timer when game window closed"
+    "Changelog": "Update for api12/dotnet9"
   }
 ]

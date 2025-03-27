@@ -3,11 +3,12 @@
   <Import Project="Dalamud.Plugin.Bootstrap.targets" />
 
   <PropertyGroup>
-    <Version>1.2.3.0</Version>
+    <Version>1.3.0.0</Version>
     <Description>A logic puzzle featuring hidden mines.</Description>
     <PackageProjectUrl>https://github.com/hunter2actual/DalamudMinesweeper</PackageProjectUrl>
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
@@ -51,5 +52,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <Visible>false</Visible>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="DalamudPackager" Version="12.0.0" />
   </ItemGroup>
 </Project>

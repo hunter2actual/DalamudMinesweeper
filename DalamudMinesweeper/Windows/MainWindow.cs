@@ -5,7 +5,7 @@ using DalamudMinesweeper.Components;
 using DalamudMinesweeper.Game;
 using DalamudMinesweeper.Sweepers;
 using DalamudMinesweeper.Sprites;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DalamudMinesweeper.Windows;
 

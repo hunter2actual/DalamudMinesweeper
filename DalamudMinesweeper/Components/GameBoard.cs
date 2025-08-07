@@ -1,7 +1,7 @@
 using System.Numerics;
 using DalamudMinesweeper.Game;
 using DalamudMinesweeper.Sprites;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DalamudMinesweeper.Components;
 

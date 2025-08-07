@@ -3,7 +3,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using DalamudMinesweeper.Game;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DalamudMinesweeper.Windows;
 

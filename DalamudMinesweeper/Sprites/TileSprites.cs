@@ -1,11 +1,12 @@
 using Dalamud.Plugin;
 using System.IO;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Numerics;
 using System.Collections.Generic;
 using DalamudMinesweeper.Game;
 using Dalamud.Interface.Textures;
 using System;
+using Dalamud.Bindings.ImGui;
 
 namespace DalamudMinesweeper.Sprites;
 
@@ -74,7 +75,7 @@ public class TileSprites
         var uvMax = (sprite.topLeftCoord + sprite.sizePx) * zoom / sheet.Size;
 
         drawList.AddImage(
-            sheet.ImGuiHandle,
+            sheet.Handle,
             cursorPos,
             cursorPos + sprite.sizePx * zoom,
             uvMin,

@@ -1,6 +1,6 @@
 using System.Numerics;
 using DalamudMinesweeper.Game;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DalamudMinesweeper.Components;
 

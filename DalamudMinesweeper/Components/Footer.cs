@@ -4,7 +4,7 @@ using Dalamud.Interface;
 using Dalamud.Interface.Components;
 using DalamudMinesweeper.Game;
 using DalamudMinesweeper.Sweepers;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 
 namespace DalamudMinesweeper.Components;
 

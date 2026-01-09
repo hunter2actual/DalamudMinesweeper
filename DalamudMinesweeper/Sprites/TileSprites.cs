@@ -69,7 +69,7 @@ public class TileSprites
             _loaded = true;
         }
 
-        var sheet = Sheets[zoom - 1].GetWrapOrDefault();
+        var sheet = Sheets[zoom - 1].GetWrapOrEmpty();
 
         var uvMin = sprite.topLeftCoord * zoom / sheet.Size;
         var uvMax = (sprite.topLeftCoord + sprite.sizePx) * zoom / sheet.Size;
